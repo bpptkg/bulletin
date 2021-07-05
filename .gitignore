@@ -1,0 +1,16 @@
+.pyc[co]
+.idea/
+.vscode/
+.tox/
+venv/
+venv3/
+node_modules
+__pycache__
+docs/_build/
+.coverage
+.env
+.pytest_cache
+TODO
+btbb.sh
+dist/
+*.egg-info
