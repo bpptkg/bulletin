@@ -67,9 +67,13 @@ LOGGING = {
     }
 }
 
-LOCKFILE = os.path.join(DATA_DIR, 'bulletin.lock')
+LOCKFILE = os.path.join(RUN_DIR, 'bulletin.lock')
 
 SEEDLINK_HOST = config('SEEDLINK_HOST', default='localhost')
 SEEDLINK_PORT = config('SEEDLINK_PORT', default=18000, cast=int)
 ARCLINK_HOST = config('ARCLINK_HOST', default='localhost')
 ARCLINK_PORT = config('ARCLINK_PORT', default=18001, cast=int)
+
+WEBOBS_USERNAME = config('WEBOBS_USERNAME')
+WEBOBS_PASSWORD = config('WEBOBS_PASSWORD')
+WEBOBS_HOST = config('WEBOBS_HOST', default='')
