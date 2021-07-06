@@ -29,7 +29,7 @@ def get_station_info():
             'component': 'Z',
             'network': 'VG',
             'ml_field': 'ml_pusunglondon',
-            'app_field': 'count_pasarbubar',
+            'app_field': 'count_pusunglondon',
         },
     ]
     return stations

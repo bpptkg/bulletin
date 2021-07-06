@@ -59,6 +59,11 @@ def fetch_mc3(starttime, endtime, eventtype='ALL'):
     if response['status'] != '200':
         return []
 
-    parser = MC3Parser(content, use_local_tz=True, stringify_datetime=False)
+    parser = MC3Parser(
+        content,
+        use_local_tz=True,
+        stringify_datetime=True,
+        calc_missing_fields=True,
+    )
 
     return parser.to_dictionary()

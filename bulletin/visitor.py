@@ -1,11 +1,13 @@
 import logging
+
 from obspy import UTCDateTime
 from webobsclient.contrib.bpptkg.db import query
 
-from .singleton import SingleInstance
-from .utils import date
 from .clients.waveform import get_waveforms
 from .magnitude import compute_magnitude_all
+from .ops import mysql_upsert
+from .singleton import SingleInstance
+from .utils import date
 
 logger = logging.getLogger(__name__)
 
@@ -67,18 +69,26 @@ class SimpleEventVisitor(SingleInstance):
             eventid = event['eventid']
             eventtype = event['eventtype']
 
-            logger.info('Found event ID: %s', eventid)
+            if result is None:
+                eventtype_db = None
+            else:
+                eventtype_db = result['eventtype']
 
-            event['eventdate_microsecond'] = (
-                event['eventdate'].microsecond / 10000)
-            event['timestamp_microsecond'] = (
-                event['timestamp'].microsecond / 10000)
+            logger.info(
+                'Found event: %s',
+                '(ID: {}, type[webobs]: {}, type[db]: {})'.format(
+                    eventid,
+                    eventtype,
+                    eventtype_db,
+                )
+            )
 
             if not self.skip_mag_calc:
                 try:
-                    onset_local = date.localize(event['eventdate'])
+                    onset_local = date.localize(
+                        date.to_datetime(event['eventdate']))
                 except ValueError as e:
-                    onset_local = event['eventdate']
+                    onset_local = date.to_datetime(event['eventdate'])
 
                 start = UTCDateTime(date.to_utc(onset_local))
                 try:
@@ -104,3 +114,16 @@ class SimpleEventVisitor(SingleInstance):
                 event.update(magnitudes)
 
             logger.info('Event data: %s', event)
+
+            if not event:
+                logger.warning('Event data is empty. Skipping.')
+                continue
+
+            if self.dry:
+                logger.info('Using dry run. Results not inserted to database.')
+            else:
+                ok = mysql_upsert(self.engine, event)
+                if ok:
+                    logger.info('Event data successfully updated.')
+                else:
+                    logger.error('Event value failed to be updated.')

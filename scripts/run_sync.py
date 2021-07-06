@@ -8,9 +8,11 @@ from bulletin.singleton import SingleInstanceException
 from bulletin.utils.date import to_datetime
 from bulletin.visitor import SimpleEventVisitor
 from sqlalchemy import create_engine
+from sqlalchemy.pool import NullPool
 from webobsclient.contrib.bpptkg.db.seismic_bulletin import Base, Bulletin
 
 logger = logging.getLogger(__name__)
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -49,7 +51,7 @@ def main():
     logging.config.dictConfig(settings.LOGGING)
 
     args = parse_args()
-    engine = create_engine(settings.DATABASE_ENGINE)
+    engine = create_engine(settings.DATABASE_ENGINE, poolclass=NullPool)
     Base.prepare(engine, reflect=True)
 
     start = to_datetime(args.start)
@@ -57,6 +59,7 @@ def main():
 
     try:
         events = webobs.fetch_mc3(start, end)
+        logger.info('Number of events: %s', len(events))
 
         visitor = SimpleEventVisitor(
             engine,
