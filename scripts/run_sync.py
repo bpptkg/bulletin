@@ -57,7 +57,6 @@ def main():
 
     try:
         events = webobs.fetch_mc3(start, end)
-        # print(events)
 
         visitor = SimpleEventVisitor(
             engine,

@@ -1,8 +1,11 @@
 import logging
-
+from obspy import UTCDateTime
 from webobsclient.contrib.bpptkg.db import query
 
 from .singleton import SingleInstance
+from .utils import date
+from .clients.waveform import get_waveforms
+from .magnitude import compute_magnitude_all
 
 logger = logging.getLogger(__name__)
 
@@ -66,12 +69,18 @@ class SimpleEventVisitor(SingleInstance):
 
             logger.info('Found event ID: %s', eventid)
 
-            event['eventdate_microsecond'] = event['eventdate'].microsecond
-            event['timestamp_microsecond'] = event['timestamp'].microsecond
+            event['eventdate_microsecond'] = (
+                event['eventdate'].microsecond / 10000)
+            event['timestamp_microsecond'] = (
+                event['timestamp'].microsecond / 10000)
 
             if not self.skip_mag_calc:
-                onset_local = date.localize(event['eventdate'])
-                start = UTCDatetime(date.utc(onset_local))
+                try:
+                    onset_local = date.localize(event['eventdate'])
+                except ValueError as e:
+                    onset_local = event['eventdate']
+
+                start = UTCDateTime(date.to_utc(onset_local))
                 try:
                     duration = float(event['duration'])
                 except Exception:

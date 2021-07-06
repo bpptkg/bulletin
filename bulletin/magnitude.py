@@ -61,9 +61,9 @@ def compute_magnitude_all(stream):
                 component=station['component'],
             )
 
-            result[station['ml_field']] = ml
-            result[station['app_field']] = app
+            results[station['ml_field']] = ml
+            results[station['app_field']] = app
         else:
-            result[station['ml_field']] = None
-            result[station['app_field']] = None
+            results[station['ml_field']] = None
+            results[station['app_field']] = None
     return results
