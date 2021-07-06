@@ -1,8 +1,13 @@
+import logging
+
 from webobsclient import MC3Client
 from webobsclient.parser import MC3Parser
 
 from .. import constants
 from ..settings import WEBOBS_HOST, WEBOBS_PASSWORD, WEBOBS_USERNAME
+from ..utils import date
+
+logger = logging.getLogger(__name__)
 
 
 def fetch_mc3(starttime, endtime, eventtype='ALL'):
@@ -16,10 +21,7 @@ def fetch_mc3(starttime, endtime, eventtype='ALL'):
     If error occurred during request, it will return empty list.
     """
 
-    client = MC3Client(
-        username=WEBOBS_USERNAME,
-        password=WEBOBS_PASSWORD,
-    )
+    client = MC3Client(username=WEBOBS_USERNAME, password=WEBOBS_PASSWORD)
 
     if WEBOBS_HOST:
         client.api.host = WEBOBS_HOST
@@ -33,6 +35,10 @@ def fetch_mc3(starttime, endtime, eventtype='ALL'):
         end = date.to_utc(date.localize(endtime))
     except ValueError:
         end = date.to_utc(endtime)
+
+    logger.info('Fetching MC3 bulletin (%s)...', client.api.host)
+    logger.info('Start time (UTC): %s', start)
+    logger.info('End time (UTC): %s', end)
 
     response, content = client.request(
         starttime=start.strftime(constants.DATETIME_FORMAT),
