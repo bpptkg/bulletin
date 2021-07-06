@@ -69,6 +69,10 @@ LOGGING = {
 
 LOCKFILE = os.path.join(RUN_DIR, 'bulletin.lock')
 
+DAY_RANGE = config('DAY_RANGE', default=3, cast=int)
+if DAY_RANGE <= 0:
+    raise ValueError('DAY_RANGE value must be greater than 0.')
+
 SEEDLINK_HOST = config('SEEDLINK_HOST', default='localhost')
 SEEDLINK_PORT = config('SEEDLINK_PORT', default=18000, cast=int)
 ARCLINK_HOST = config('ARCLINK_HOST', default='localhost')

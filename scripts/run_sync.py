@@ -1,11 +1,12 @@
 import argparse
+import datetime
 import logging
 import logging.config
 
 from bulletin import settings
 from bulletin.clients import webobs
 from bulletin.singleton import SingleInstanceException
-from bulletin.utils.date import to_datetime
+from bulletin.utils import date
 from bulletin.visitor import SimpleEventVisitor
 from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
@@ -20,12 +21,12 @@ def parse_args():
         'synchronization.')
 
     parser.add_argument(
-        'start',
+        '-s', '--start',
         help="Start time of time window in 'YYYY-mm-dd' "
         "or 'YYYY-mm-dd HH:MM:SS' format (Asia/Jakarta time zone).")
 
     parser.add_argument(
-        'end',
+        '-e', '--end',
         help="End time of time window in 'YYYY-mm-dd' "
         "or 'YYYY-mm-dd HH:MM:SS' format (Asia/Jakarta time zone).")
 
@@ -40,7 +41,7 @@ def parse_args():
         help='Skip event magnitude calculation.')
 
     parser.add_argument(
-        '-s', '--print-only',
+        '-p', '--print-only',
         action='store_true',
         help='Print events that have not been synched yet.')
 
@@ -54,8 +55,15 @@ def main():
     engine = create_engine(settings.DATABASE_ENGINE, poolclass=NullPool)
     Base.prepare(engine, reflect=True)
 
-    start = to_datetime(args.start)
-    end = to_datetime(args.end)
+    if (
+        (args.start is not None)
+        and (args.end is not None)
+    ):
+        start = date.to_datetime(args.start)
+        end = date.to_datetime(args.end)
+    else:
+        end = date.now()
+        start = end - datetime.timedelta(days=settings.DAY_RANGE)
 
     try:
         events = webobs.fetch_mc3(start, end)
