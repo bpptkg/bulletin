@@ -37,11 +37,17 @@ class SimpleEventVisitor(SingleInstance):
             else:
                 eventtype_db = result['eventtype']
 
+            eventid = event['eventid']
+            eventtype = event['eventtype']
+            eventdate = event['eventdate']
+
             logger.info(
                 'Found event: %s',
-                '(ID: {}, type[webobs]: {}, type[db]: {})'.format(
-                    event['eventid'],
-                    event['eventtype'],
+                '(ID: {}, eventdate[local]: {}, type[webobs]: {}, '
+                'type[db]: {})'.format(
+                    eventid,
+                    eventdate,
+                    eventtype,
                     eventtype_db,
                 )
             )
@@ -68,6 +74,7 @@ class SimpleEventVisitor(SingleInstance):
         for event, result in query.filter_exact(self.engine, self.table, events):
             eventid = event['eventid']
             eventtype = event['eventtype']
+            eventdate = event['eventdate']
 
             if result is None:
                 eventtype_db = None
@@ -76,8 +83,10 @@ class SimpleEventVisitor(SingleInstance):
 
             logger.info(
                 'Found event: %s',
-                '(ID: {}, type[webobs]: {}, type[db]: {})'.format(
+                '(ID: {}, eventdate[local]: {}, type[webobs]: {}, '
+                'type[db]: {})'.format(
                     eventid,
+                    eventdate,
                     eventtype,
                     eventtype_db,
                 )
