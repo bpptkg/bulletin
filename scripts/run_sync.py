@@ -31,6 +31,11 @@ def parse_args():
         "or 'YYYY-mm-dd HH:MM:SS' format (Asia/Jakarta time zone).")
 
     parser.add_argument(
+        '-i', '--eventtype',
+        default='ALL',
+        help='Run only for certain event type, e.g VTA, VTB, MP.')
+
+    parser.add_argument(
         '-d', '--dry',
         action='store_true',
         help='Do not insert the results to database (dry run).')
@@ -66,7 +71,7 @@ def main():
         start = end - datetime.timedelta(days=settings.DAY_RANGE)
 
     try:
-        events = webobs.fetch_mc3(start, end)
+        events = webobs.fetch_mc3(start, end, eventtype=args.eventtype)
         logger.info('Number of events: %s', len(events))
 
         visitor = SimpleEventVisitor(
