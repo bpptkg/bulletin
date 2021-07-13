@@ -63,6 +63,7 @@ def fetch_mc3(starttime, endtime, eventtype='ALL'):
         content,
         use_local_tz=True,
         stringify_datetime=True,
+        datetime_isoformat=False,
         calc_missing_fields=True,
     )
 
