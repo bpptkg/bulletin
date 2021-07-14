@@ -72,7 +72,10 @@ class SimpleEventVisitor(SingleInstance):
         Process all events that have not been synched between WebObs and
         database.
         """
-        for event, result in query.filter_exact(self.engine, self.table, events):
+        for event, result in query.filter_exact(
+                self.engine, self.table, events):
+            logger.info('Event from WebObs: %s', event)
+
             eventid = event['eventid']
             eventtype = event['eventtype']
             eventdate = event['eventdate']
