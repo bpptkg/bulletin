@@ -1,5 +1,6 @@
 import logging
 
+import pandas as pd
 from obspy import UTCDateTime
 from webobsclient.contrib.bpptkg.db import query
 
@@ -100,10 +101,10 @@ class SimpleEventVisitor(SingleInstance):
                     onset_local = date.to_datetime(event['eventdate'])
 
                 start = UTCDateTime(date.to_utc(onset_local))
-                try:
-                    duration = float(event['duration'])
-                except Exception:
+                if event['duration'] is None:
                     duration = 30
+                else:
+                    duration = float(event['duration'])
 
                 end = start + duration
 
