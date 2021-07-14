@@ -104,8 +104,11 @@ class SimpleEventVisitor(SingleInstance):
                     onset_local = date.to_datetime(event['eventdate'])
 
                 start = UTCDateTime(date.to_utc(onset_local))
-                if event['duration'] is None:
-                    duration = 30
+                if (
+                    (event['duration'] is None) or
+                    (pd.isna(event['duration']))
+                ):
+                    duration = 30.0
                 else:
                     duration = float(event['duration'])
 
