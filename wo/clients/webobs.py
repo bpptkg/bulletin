@@ -11,13 +11,12 @@ from ..utils import date
 logger = logging.getLogger(__name__)
 
 
-def fetch_mc3(starttime, endtime, eventtype='ALL'):
+def fetch_mc3(start, end, eventtype='ALL'):
     """
     Fetch WebObs MC3 bulletin by particular time range and eventtype, and then
     return as dictionary.
 
-    Note that starttime and endtime are using local time zone and be converted
-    to UTC automatically.
+    Note that starttime and endtime are using UTC time zone.
 
     If error occurred during request, it will return empty list.
     """
@@ -27,16 +26,6 @@ def fetch_mc3(starttime, endtime, eventtype='ALL'):
     if WEBOBS_HOST:
         client.api.host = WEBOBS_HOST
 
-    try:
-        start = date.to_utc(date.localize(starttime))
-    except ValueError:
-        start = date.to_utc(starttime)
-
-    try:
-        end = date.to_utc(date.localize(endtime))
-    except ValueError:
-        end = date.to_utc(endtime)
-
     logger.info('Fetching MC3 bulletin (%s)...', client.api.host)
     logger.info('Start time (UTC): %s', start)
     logger.info('End time (UTC): %s', end)
@@ -44,31 +33,24 @@ def fetch_mc3(starttime, endtime, eventtype='ALL'):
     response, content = client.request(
         starttime=start.strftime(constants.DATETIME_FORMAT),
         endtime=end.strftime(constants.DATETIME_FORMAT),
-        slt=0,
         type=eventtype,
-        duree='ALL',
-        ampoper='eq',
         amplitude='ALL',
-        locstatus=0,
-        located=0,
-        hideloc=0,
-        mc='MC3',
+        ampoper='eq',
         dump='bul',
+        duree='ALL',
         graph='movsum',
+        hideloc=0,
+        located=0,
+        locstatus=0,
+        mc='MC3',
+        slt=0,
     )
 
     if response['status'] != '200':
         return []
 
-    parser = MC3Parser(
-        content,
-        use_local_tz=True,
-        stringify_datetime=True,
-        datetime_isoformat=False,
-        calc_missing_fields=True,
-    )
-
-    return parser.to_dictionary()
+    parser = MC3Parser()
+    return parser.to_dict(content)
 
 
 class WebObsMC3Fetcher:
@@ -129,16 +111,12 @@ class WebObsMC3Fetcher:
 
         if eventid is not None:
             event = df.loc[df['eventid'] == eventid]
-            if event.empty:
-                return None
-            return event.to_dict(orient='records')[0]
+            if not event.empty:
+                return event.to_dict(orient='records')[0]
 
         if sc3id is not None:
             event = df.loc[df['seiscompid'] == sc3id]
-            if event.empty:
-                event = df.loc[df['eventdate'] == eventdate]
-                if event.empty:
-                    return None
+            if not event.empty:
                 return event.to_dict(orient='records')[0]
 
         event = df.loc[df['eventdate'] == eventdate]

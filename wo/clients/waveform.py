@@ -84,11 +84,10 @@ class WaveformClient(object):
 
 
 def get_waveforms(starttime, endtime):
-    client = WaveformClient(
-        seedlink_host=SEEDLINK_HOST,
-        seedlink_port=SEEDLINK_PORT,
-        arclink_host=ARCLINK_HOST,
-        arclink_port=ARCLINK_PORT)
+    client = WaveformClient(seedlink_host=SEEDLINK_HOST,
+                            seedlink_port=SEEDLINK_PORT,
+                            arclink_host=ARCLINK_HOST,
+                            arclink_port=ARCLINK_PORT)
 
     stream = None
     delta = UTCDateTime() - endtime

@@ -4,30 +4,34 @@ import richter
 def get_station_info():
     stations = [
         {
-            'station': 'MEDEL',
-            'component': 'Z',
             'network': 'VG',
+            'station': 'MEDEL',
+            'channel': 'EHZ',
+            'component': 'Z',
             'ml_field': 'ml_deles',
             'app_field': 'count_deles',
         },
         {
-            'station': 'MELAB',
-            'component': 'Z',
             'network': 'VG',
+            'station': 'MELAB',
+            'channel': 'HHZ',
+            'component': 'Z',
             'ml_field': 'ml_labuhan',
             'app_field': 'count_labuhan',
         },
         {
-            'station': 'MEPAS',
-            'component': 'Z',
             'network': 'VG',
+            'station': 'MEPAS',
+            'channel': 'HHZ',
+            'component': 'Z',
             'ml_field': 'ml_pasarbubar',
             'app_field': 'count_pasarbubar',
         },
         {
-            'station': 'MEPUS',
-            'component': 'Z',
             'network': 'VG',
+            'station': 'MEPUS',
+            'channel': 'EHZ',
+            'component': 'Z',
             'ml_field': 'ml_pusunglondon',
             'app_field': 'count_pusunglondon',
         },
@@ -52,6 +56,7 @@ def compute_magnitude_all(stream):
                 station['station'],
                 network=station['network'],
                 component=station['component'],
+                channel=station['channel'],
             )
 
             app = richter.compute_app(
@@ -59,6 +64,7 @@ def compute_magnitude_all(stream):
                 station['station'],
                 network=station['network'],
                 component=station['component'],
+                channel=station['channel'],
             )
 
             results[station['ml_field']] = ml
