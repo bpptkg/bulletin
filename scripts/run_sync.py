@@ -3,14 +3,14 @@ import datetime
 import logging
 import logging.config
 
-from bulletin import settings
-from bulletin.clients import webobs
-from bulletin.singleton import SingleInstanceException
-from bulletin.utils import date
-from bulletin.visitor import SimpleEventVisitor
 from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 from webobsclient.contrib.bpptkg.db.seismic_bulletin import Base, Bulletin
+from wo import settings
+from wo.clients import webobs
+from wo.singleton import SingleInstanceException
+from wo.utils import date
+from wo.visitor import SimpleEventVisitor
 
 logger = logging.getLogger(__name__)
 
@@ -60,18 +60,19 @@ def main():
     engine = create_engine(settings.DATABASE_ENGINE, poolclass=NullPool)
     Base.prepare(engine, reflect=True)
 
-    if (
-        (args.start is not None)
-        and (args.end is not None)
-    ):
-        start = date.to_datetime(args.start)
-        end = date.to_datetime(args.end)
+    if args.start is not None and args.end is not None:
+        start = date.to_datetime(args.start, aware=True)
+        end = date.to_datetime(args.end, aware=True)
     else:
-        end = date.now()
+        end = date.now(aware=True)
         start = end - datetime.timedelta(days=settings.DAY_RANGE)
 
+    logger.info('Time range (local): %s to %s', start, end)
+    starttime = date.to_utc(start)
+    endtime = date.to_utc(end)
+
     try:
-        events = webobs.fetch_mc3(start, end, eventtype=args.eventtype)
+        events = webobs.fetch_mc3(starttime, endtime, eventtype=args.eventtype)
         logger.info('Number of events: %s', len(events))
 
         visitor = SimpleEventVisitor(
