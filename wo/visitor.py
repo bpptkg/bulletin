@@ -149,6 +149,7 @@ def _execute_action(
         eventdate=None,
         eventid=None,
         eventtype=None,
+        operator=None,
         sc3id=None,
 ):
     """
@@ -156,20 +157,24 @@ def _execute_action(
     """
 
     logger.info('Triggered action: %s', action)
+    logger.info('Event meta data: [eventdate: %s, eventid: %s, '
+                'sc3id: %s, eventtype: %s, operator: %s]',
+                eventdate, eventid, sc3id, eventtype, operator)
 
     if action == WebObsAction.WEBOBS_UPDATE_EVENT:
         fetcher = webobs.WebObsMC3Fetcher()
-        event = fetcher.get_mc3(
-            eventdate, eventid=eventid, sc3id=sc3id, eventtype=eventtype)
+        event = fetcher.get_mc3(eventdate, eventid=eventid, sc3id=sc3id,
+                                eventtype=eventtype)
+
+        # If event is None, the calculation could not be proceeded. So, just
+        # exit the function.
         if event is None:
-            logger.error(
-                'Event with [eventdate: %s, eventid: %s, '
-                'sc3id: %s, eventtype: %s] could not be found.',
-                eventdate, eventid, sc3id, eventtype)
+            logger.error('Event could not be found.')
             return
+        logger.info('Matched event from WebObs MC3: %s', event)
 
         # Calculate magnitude info.
-        start = UTCDateTime(event['eventdate'].to_pydatetime())
+        start = UTCDateTime(event['eventdate'])
         if event['duration'] is None or pd.isna(event['duration']):
             duration = 30.0
         else:
@@ -201,9 +206,8 @@ def _execute_action(
 
     elif action == WebObsAction.WEBOBS_HIDE_EVENT:
         if eventid is None:
-            logger.error('Action %s requires eventid value not None',
-                         WebObsAction.WEBOBS_HIDE_EVENT)
-            return
+            raise ValueError('Action %s requires eventid value not None',
+                             WebObsAction.WEBOBS_HIDE_EVENT)
 
         if dry_run:
             logger.info('Using dry run. Event is not hidden to database.')
@@ -216,9 +220,8 @@ def _execute_action(
 
     elif action == WebObsAction.WEBOBS_DELETE_EVENT:
         if eventid is None:
-            logger.error('Action %s requires eventid value not None',
-                         WebObsAction.WEBOBS_DELETE_EVENT)
-            return
+            raise ValueError('Action %s requires eventid value not None',
+                             WebObsAction.WEBOBS_DELETE_EVENT)
 
         if dry_run:
             logger.info('Using dry run. Event is not deleted to database.')
@@ -241,6 +244,7 @@ def update_event(
         eventid=None,
         sc3id=None,
         eventtype=None,
+        operator=None,
 ):
     """
     Update an event in the database.
@@ -253,10 +257,11 @@ def update_event(
         eventid=eventid,
         sc3id=sc3id,
         eventtype=eventtype,
+        operator=operator,
     )
 
 
-def hide_event(engine, table, eventid):
+def hide_event(engine, table, eventid, **kwargs):
     """
     Hide an event in the database.
     """
@@ -265,10 +270,11 @@ def hide_event(engine, table, eventid):
         table,
         WebObsAction.WEBOBS_HIDE_EVENT,
         eventid=eventid,
+        **kwargs,
     )
 
 
-def delete_event(engine, table, eventid):
+def delete_event(engine, table, eventid, **kwargs):
     """
     Delete an event in the database.
     """
@@ -277,4 +283,5 @@ def delete_event(engine, table, eventid):
         table,
         WebObsAction.WEBOBS_DELETE_EVENT,
         eventid=eventid,
+        **kwargs,
     )

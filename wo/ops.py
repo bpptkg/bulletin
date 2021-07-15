@@ -1,7 +1,8 @@
 import logging
 
 import pandas as pd
-from webobsclient.bpptkg.db.sessions import session_scope
+from webobsclient.contrib.bpptkg.db.sessions import session_scope
+from .settings import TIMEZONE
 
 logger = logging.getLogger(__name__)
 
@@ -129,11 +130,19 @@ def mysql_upsert(engine, data):
     df = pd.DataFrame([data, ])
     df = df.where((pd.notnull(df)), None)
 
-    data = map(tuple, df[column_names].values.tolist())
+    # Convert any timestamp column to local time zone.
+    df['eventdate'] = pd.to_datetime(
+        df['eventdate'], utc=True).dt.tz_convert(TIMEZONE).dt.tz_localize(None)
+    df['timestamp'] = pd.to_datetime(
+        df['timestamp'], utc=True).dt.tz_convert(TIMEZONE).dt.tz_localize(None)
+    df['eventdate'] = df['eventdate'].astype(str)
+    df['timestamp'] = df['timestamp'].astype(str)
+
+    entries = map(tuple, df[column_names].values.tolist())
     connection = engine.raw_connection()
     cursor = connection.cursor()
     try:
-        cursor.executemany(insert_query, data)
+        cursor.executemany(insert_query, entries)
         connection.commit()
         return True
     except Exception as e:
