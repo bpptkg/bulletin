@@ -48,7 +48,7 @@ LOGGING = {
         'production': {
             'level': LOG_LEVEL,
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(LOGGING_ROOT, 'bulletin.log'),
+            'filename': os.path.join(LOGGING_ROOT, 'wo.log'),
             'maxBytes': 1024 * 1024 * 5,
             'backupCount': 7,
             'formatter': 'verbose',
