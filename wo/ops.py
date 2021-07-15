@@ -1,8 +1,29 @@
 import logging
 
 import pandas as pd
+from webobsclient.bpptkg.db.sessions import session_scope
 
 logger = logging.getLogger(__name__)
+
+
+def hide_event(engine, table, eventid):
+    with session_scope(engine) as session:
+        queryset = session.query(table).get(eventid)
+        if queryset is not None:
+            queryset.eventtype = None
+            session.commit()
+            return True
+        return False
+
+
+def delete_event(engine, table, eventid):
+    with session_scope(engine) as session:
+        queryset = session.query(table).get(eventid)
+        if queryset is not None:
+            queryset.delete()
+            session.commit()
+            return True
+        return False
 
 
 def mysql_upsert(engine, data):

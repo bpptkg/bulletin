@@ -15,22 +15,12 @@ with io.open('bulletin/version.py', 'rt', encoding='utf-8') as f:
 description = 'WebObs to seismic bulletin utility library.'
 
 setup(
-    name='bulletin',
+    name='bpptkg-wo',
     version=version,
     description=description,
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
     license='MIT',
-    install_requires=[
-        'numpy',
-        'pandas',
-        'sqlalchemy',
-        'obspy',
-        'webobsclient',
-        'bpptkg-richter',
-        'mysqlclient',
-        'python-decouple',
-    ],
     author='Indra Rudianto',
     author_email='indrarudianto.official@gmail.com',
     url='https://gitlab.com/bpptkg/bulletin',

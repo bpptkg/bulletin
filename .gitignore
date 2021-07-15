@@ -14,3 +14,4 @@ TODO
 btbb.sh
 dist/
 *.egg-info
+db.sqlite3

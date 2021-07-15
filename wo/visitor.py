@@ -6,9 +6,10 @@ from webobsclient.contrib.bpptkg.db import query
 
 from .clients.waveform import get_waveforms
 from .magnitude import compute_magnitude_all
-from .ops import mysql_upsert
+from . import ops
 from .singleton import SingleInstance
 from .utils import date
+from .actions import WebObsAction
 
 logger = logging.getLogger(__name__)
 
@@ -143,3 +144,74 @@ class SimpleEventVisitor(SingleInstance):
                     logger.info('Event data successfully updated.')
                 else:
                     logger.error('Event value failed to be updated.')
+
+
+def process_action(engine, table, eventid, action, eventdate=None, dry_run=False):
+    if action == WebObsAction.WEBOBS_UPDATE_EVENT:
+        event = webobs.get_event(eventid, eventdate)
+        if event is None:
+            return
+
+        # Calculate magnitude info.
+        try:
+            onset_local = date.localize(date.to_datetime(event['eventdate']))
+        except ValueError as e:
+            onset_local = date.to_datetime(event['eventdate'])
+        start = UTCDateTime(date.to_utc(onset_local))
+        if event['duration'] is None or pd.isna(event['duration']):
+            duration = 30.0
+        else:
+            duration = float(event['duration'])
+
+        end = start + duration
+
+        stream = get_waveforms(start, end)
+        if stream is not None:
+            logger.info(stream.__str__(extended=True))
+
+        magnitudes = compute_magnitude_all(stream)
+        logger.info('Magnitude info: %s', magnitudes)
+        event.update(magnitudes)
+
+        # Insert to database.
+        logger.info('Event data: %s', event)
+        if not event:
+            logger.warning('Event data is empty.')
+
+        if dry_run:
+            logger.info('Using dry run. Event is not inserted to database.')
+        else:
+            ok = ops.mysql_upsert(engine, event)
+            if ok:
+                logger.info('Event data successfully updated.')
+            else:
+                logger.error('Event data failed to be updated.')
+
+    elif action == WebObsAction.WEBOBS_HIDE_EVENT:
+        ok = ops.hide_event(eventid)
+        if ok:
+            logger.info('Event successfully hidden from database.')
+        else:
+            logger.error('Event failed to be hidden from database.')
+
+    elif action == WebObsAction.WEBOBS_DELETE_EVENT:
+        ok = ops.delete_event(eventid)
+        if ok:
+            logger.info('Event successfully deleted from database.')
+        else:
+            logger.error('Event failed to be deleted from database.')
+
+    else:
+        logger.error('Unsupported action: %s', action)
+
+
+def update_event(engine, table, eventid):
+    pass
+
+
+def hide_event(eventid):
+    pass
+
+
+def delete_event(eventid):
+    pass
