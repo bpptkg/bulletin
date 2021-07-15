@@ -17,10 +17,16 @@ def hide_event(engine, table, eventid):
 
 
 def delete_event(engine, table, eventid):
+    """
+    For current version, we only implement soft delete instead of actually
+    delete an event in the database to prevent accidental deletion.
+
+    Setting eventtype to None is sufficient to resemble event deletion.
+    """
     with session_scope(engine) as session:
         queryset = session.query(table).get(eventid)
         if queryset is not None:
-            queryset.delete()
+            queryset.eventtype = None
             session.commit()
             return True
         return False
