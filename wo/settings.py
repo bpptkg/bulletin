@@ -16,6 +16,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 DATABASE_ENGINE = config('SEISMIC_BULLETIN_ENGINE')
 MIGRATED = config('MIGRATED', default=True, cast=bool)
+CONN_MAX_AGE = config('CONN_MAX_AGE', default=60*60, cast=int)
 MSD_EXT = '.msd'
 
 TIMEZONE = config('TIMEZONE', default='Asia/Jakarta')
@@ -81,3 +82,7 @@ ARCLINK_PORT = config('ARCLINK_PORT', default=18001, cast=int)
 WEBOBS_USERNAME = config('WEBOBS_USERNAME')
 WEBOBS_PASSWORD = config('WEBOBS_PASSWORD')
 WEBOBS_HOST = config('WEBOBS_HOST', default='')
+
+# This variable can be used to mock `wo.clients.waveform.get_waveforms()`
+# function for testing purposes.
+GET_WAVEFORMS_FUNCTION = None

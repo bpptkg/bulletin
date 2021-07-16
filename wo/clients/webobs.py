@@ -73,7 +73,7 @@ class WebObsMC3Fetcher:
         logger.info('Fetching MC3 bulletin (%s)...', self.client.api.host)
         logger.info('Time range (UTC): %s to %s', start, end)
 
-        response, content = client.request(
+        response, content = self.client.request(
             starttime=start.strftime(constants.DATETIME_FORMAT),
             endtime=end.strftime(constants.DATETIME_FORMAT),
             type=eventtype,

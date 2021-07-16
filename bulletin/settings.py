@@ -228,3 +228,14 @@ REST_FRAMEWORK = {
         '%H:%M',        # '14:30'
     ],
 }
+
+REDIS_URL = config('REDIS_URL', default='redis://localhost:6379')
+
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
+CELERY_ACCEPT_CONTENT = ['application/json', 'application/x-python-serialize']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+
+MOCK_SEISCOMP_SERVER = config('MOCK_SEISCOMP_SERVER', default=False, cast=bool)
+WEBOBS_FETCH_TIME_WAIT = config('WEBOBS_FETCH_TIME_WAIT', default=10, cast=int)

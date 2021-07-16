@@ -7,17 +7,29 @@ from .settings import TIMEZONE
 logger = logging.getLogger(__name__)
 
 
-def hide_event(engine, table, eventid):
+def hide_event(engine, table, eventid, operator):
     with session_scope(engine) as session:
         queryset = session.query(table).get(eventid)
         if queryset is not None:
             queryset.eventtype = None
+            queryset.operator = operator
             session.commit()
             return True
         return False
 
 
-def delete_event(engine, table, eventid):
+def restore_event(engine, table, eventid, eventtype, operator):
+    with session_scope(engine) as session:
+        queryset = session.query(table).get(eventid)
+        if queryset is not None:
+            queryset.eventtype = eventtype
+            queryset.operator = operator
+            session.commit()
+            return True
+        return False
+
+
+def delete_event(engine, table, eventid, operator):
     """
     For current version, we only implement soft delete instead of actually
     delete an event in the database to prevent accidental deletion.
@@ -28,6 +40,7 @@ def delete_event(engine, table, eventid):
         queryset = session.query(table).get(eventid)
         if queryset is not None:
             queryset.eventtype = None
+            queryset.operator = operator
             session.commit()
             return True
         return False
@@ -127,16 +140,20 @@ def mysql_upsert(engine, data):
         'location_type',
     ]
 
+    logger.info('Preparing event data entry.')
     df = pd.DataFrame([data, ])
-    df = df.where((pd.notnull(df)), None)
 
     # Convert any timestamp column to local time zone.
-    df['eventdate'] = pd.to_datetime(
-        df['eventdate'], utc=True).dt.tz_convert(TIMEZONE).dt.tz_localize(None)
-    df['timestamp'] = pd.to_datetime(
-        df['timestamp'], utc=True).dt.tz_convert(TIMEZONE).dt.tz_localize(None)
+    df['eventdate'] = df['eventdate'].dt.tz_convert(
+        TIMEZONE).dt.tz_localize(None)
+    df['timestamp'] = df['timestamp'].dt.tz_convert(
+        TIMEZONE).dt.tz_localize(None)
     df['eventdate'] = df['eventdate'].astype(str)
     df['timestamp'] = df['timestamp'].astype(str)
+
+    df = df.astype(object).where((pd.notnull(df)), None)
+
+    logger.info('Event entries: %s', df.to_dict(orient='records'))
 
     entries = map(tuple, df[column_names].values.tolist())
     connection = engine.raw_connection()

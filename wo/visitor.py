@@ -4,7 +4,7 @@ import pandas as pd
 from obspy import UTCDateTime
 from webobsclient.contrib.bpptkg.db import query
 
-from . import ops
+from . import ops, settings
 from .actions import WebObsAction
 from .clients import webobs
 from .clients.waveform import get_waveforms
@@ -182,7 +182,15 @@ def _execute_action(
 
         end = start + duration
 
-        stream = get_waveforms(start, end)
+        get_waveforms_func = settings.GET_WAVEFORMS_FUNCTION
+        if get_waveforms_func is not None:
+            if not callable(get_waveforms_func):
+                raise ValueError(
+                    'GET_WAVEFORMS_FUNCTION value must be a function '
+                    'instead of type of {}'.format(type(get_waveforms_func)))
+            stream = get_waveforms_func(start, end)
+        else:
+            stream = get_waveforms(start, end)
         if stream is not None:
             logger.info(stream.__str__(extended=True))
 
@@ -210,13 +218,31 @@ def _execute_action(
                              WebObsAction.WEBOBS_HIDE_EVENT)
 
         if dry_run:
-            logger.info('Using dry run. Event is not hidden to database.')
+            logger.info('Using dry run. Event is not hidden.')
         else:
-            ok = ops.hide_event(eventid)
+            ok = ops.hide_event(engine, table, eventid, operator)
             if ok:
-                logger.info('Event successfully hidden from database.')
+                logger.info('Event successfully hidden.')
             else:
-                logger.error('Event failed to be hidden from database.')
+                logger.error('Event failed to be hidden.')
+
+    elif action == WebObsAction.WEBOBS_RESTORE_EVENT:
+        if eventid is None:
+            raise ValueError('Action %s requires eventid value not None',
+                             WebObsAction.WEBOBS_RESTORE_EVENT)
+
+        if eventtype is None:
+            raise ValueError('Action %s requires eventtype value not None',
+                             WebObsAction.WEBOBS_RESTORE_EVENT)
+
+        if dry_run:
+            logger.info('Using dry run. Event is not restored.')
+        else:
+            ok = ops.restore_event(engine, table, eventid, eventtype, operator)
+            if ok:
+                logger.info('Event successfully restored.')
+            else:
+                logger.error('Event failed to be restore.')
 
     elif action == WebObsAction.WEBOBS_DELETE_EVENT:
         if eventid is None:
@@ -224,13 +250,13 @@ def _execute_action(
                              WebObsAction.WEBOBS_DELETE_EVENT)
 
         if dry_run:
-            logger.info('Using dry run. Event is not deleted to database.')
+            logger.info('Using dry run. Event is not deleted.')
         else:
-            ok = ops.delete_event(eventid)
+            ok = ops.delete_event(engine, table, eventid, operator)
             if ok:
-                logger.info('Event successfully deleted from database.')
+                logger.info('Event successfully deleted.')
             else:
-                logger.error('Event failed to be deleted from database.')
+                logger.error('Event failed to be deleted.')
 
     else:
         logger.error('Unsupported action: %s', action)
@@ -270,6 +296,20 @@ def hide_event(engine, table, eventid, **kwargs):
         table,
         WebObsAction.WEBOBS_HIDE_EVENT,
         eventid=eventid,
+        **kwargs,
+    )
+
+
+def restore_event(engine, table, eventid, eventtype, **kwargs):
+    """
+    Restore an event in the database.
+    """
+    _execute_action(
+        engine,
+        table,
+        WebObsAction.WEBOBS_RESTORE_EVENT,
+        eventid=eventid,
+        eventtype=eventtype,
         **kwargs,
     )
 

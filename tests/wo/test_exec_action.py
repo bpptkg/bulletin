@@ -18,6 +18,7 @@ DATA_DIR = os.path.join(os.path.dirname(
 
 class ExecActionTest(unittest.TestCase):
 
+    @patch('wo.ops.restore_event')
     @patch('wo.ops.delete_event')
     @patch('wo.ops.hide_event')
     @patch('wo.ops.mysql_upsert')
@@ -28,7 +29,8 @@ class ExecActionTest(unittest.TestCase):
                          mock_mc3_fetcher,
                          mock_mysql_upsert,
                          mock_hide_event,
-                         mock_delete_event):
+                         mock_delete_event,
+                         mock_restore_event):
         st = read(os.path.join(DATA_DIR, 'stream.msd'))
         mock_get_waveforms.return_value = st
 
@@ -40,6 +42,7 @@ class ExecActionTest(unittest.TestCase):
         mock_mysql_upsert.return_value = True
         mock_hide_event.return_value = True
         mock_delete_event.return_value = True
+        mock_restore_event.return_value = True
 
         engine = create_engine(settings.DATABASE_ENGINE)
         eventdate = datetime.datetime.fromisoformat(
@@ -54,12 +57,23 @@ class ExecActionTest(unittest.TestCase):
         _execute_action(engine, Bulletin, WebObsAction.WEBOBS_HIDE_EVENT,
                         eventid='2021-07#2380')
 
+        _execute_action(engine, Bulletin, WebObsAction.WEBOBS_RESTORE_EVENT,
+                        eventid='2021-07#2380', eventtype='ROCKFALL')
+
         _execute_action(engine, Bulletin, WebObsAction.WEBOBS_DELETE_EVENT,
                         eventid='2021-07#2381')
 
         with self.assertRaises(ValueError):
             _execute_action(engine, Bulletin, WebObsAction.WEBOBS_HIDE_EVENT,
                             eventid=None)
+
+        with self.assertRaises(ValueError):
+            _execute_action(engine, Bulletin, WebObsAction.WEBOBS_RESTORE_EVENT,
+                            eventid=None, eventtype='ROCKFALL')
+
+        with self.assertRaises(ValueError):
+            _execute_action(engine, Bulletin, WebObsAction.WEBOBS_RESTORE_EVENT,
+                            eventid='2021-07#2380', eventtype=None)
 
         with self.assertRaises(ValueError):
             _execute_action(engine, Bulletin, WebObsAction.WEBOBS_DELETE_EVENT,
