@@ -45,22 +45,23 @@ class WebObsEndpoint(Endpoint):
                 'Unsupported action name: {}'.format(action))
 
         eventdate_str = request.POST.get('eventdate')
-        try:
-            eventdate = dateparse.parse_datetime(eventdate_str)
-            eventdate = eventdate.astimezone(pytz.utc)
-        except ValueError as e:
-            raise exceptions.InvalidParameter(
-                'Invalid eventdate value: {}'.format(eventdate_str))
-
         eventid = request.POST.get('eventid')
         sc3id = request.POST.get('sc3id')
         operator = request.POST.get('operator')
         eventtype = request.POST.get('eventtype')
 
         if action == WebObsAction.WEBOBS_UPDATE_EVENT.name:
+            try:
+                eventdate = dateparse.parse_datetime(eventdate_str)
+            except ValueError as e:
+                raise exceptions.InvalidParameter(
+                    'Invalid eventdate value: {}'.format(eventdate_str))
+
             if eventdate is None:
                 raise exceptions.MissingParameter(
                     'Missing eventdate parameter.')
+
+            eventdate = eventdate.astimezone(pytz.utc)
 
             tasks.update_event.apply_async(
                 args=(eventdate, ),

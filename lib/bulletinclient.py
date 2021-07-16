@@ -129,9 +129,10 @@ def validate_arguments(args):
             sys.exit(1)
 
     elif action == WebObsAction.WEBOBS_DELETE_EVENT:
-        print(missing_eventid_msg.format(action_name=action),
-              file=sys.stderr)
-        sys.exit(1)
+        if args.eventid is None:
+            print(missing_eventid_msg.format(action_name=action),
+                  file=sys.stderr)
+            sys.exit(1)
 
 
 def main():
