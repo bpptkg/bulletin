@@ -63,7 +63,7 @@ class WebObsEndpoint(Endpoint):
                     'Missing eventdate parameter.')
 
             tasks.update_event.apply_async(
-                args=[eventdate, ],
+                args=(eventdate, ),
                 kwargs={
                     'eventid': eventid,
                     'sc3id': sc3id,
@@ -78,7 +78,7 @@ class WebObsEndpoint(Endpoint):
                 raise exceptions.MissingParameter('Missing eventid parameter.')
 
             tasks.hide_event.apply_async(
-                args=[eventid, ],
+                args=(eventid, ),
                 kwargs={'operator': operator},
                 serializer='pickle',
             )
@@ -92,7 +92,7 @@ class WebObsEndpoint(Endpoint):
                     'Missing eventtype parameter.')
 
             tasks.restore_event.apply_async(
-                args=[eventid, eventtype],
+                args=(eventid, eventtype),
                 kwargs={'operator': operator},
                 serializer='pickle',
             )
@@ -102,12 +102,11 @@ class WebObsEndpoint(Endpoint):
                 raise exceptions.MissingParameter('Missing eventid parameter.')
 
             tasks.delete_event.apply_async(
-                args=[eventid, ],
+                args=(eventid, ),
                 kwargs={'operator': operator},
                 serializer='pickle',
             )
 
-        eventid = request.POST.get('eventid')
         response['status'] = 'submitted'
         response['timestamp'] = timezone.now()
         action_name, action_id = get_action(action)

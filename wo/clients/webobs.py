@@ -1,5 +1,6 @@
 import datetime
 import logging
+import time
 
 from webobsclient import MC3Client
 from webobsclient.parser import MC3Parser
@@ -55,7 +56,11 @@ def fetch_mc3(start, end, eventtype='ALL'):
 
 class WebObsMC3Fetcher:
 
-    def __init__(self, client=None, parser=None):
+    def __init__(self, client=None, parser=None, max_retries=5,
+                 retry_delay=10):
+        self.max_retries = max_retries
+        self.retry_delay = retry_delay
+
         if client is not None:
             self.client = client
         else:
@@ -73,24 +78,30 @@ class WebObsMC3Fetcher:
         logger.info('Fetching MC3 bulletin (%s)...', self.client.api.host)
         logger.info('Time range (UTC): %s to %s', start, end)
 
-        response, content = self.client.request(
-            starttime=start.strftime(constants.DATETIME_FORMAT),
-            endtime=end.strftime(constants.DATETIME_FORMAT),
-            type=eventtype,
-            slt=0,
-            amplitude='ALL',
-            ampoper='eq',
-            dump='bul',
-            duree='ALL',
-            graph='movsum',
-            hideloc=0,
-            located=0,
-            locstatus=0,
-            mc='MC3',
-        )
+        for i in range(self.max_retries):
+            try:
+                response, content = self.client.request(
+                    starttime=start.strftime(constants.DATETIME_FORMAT),
+                    endtime=end.strftime(constants.DATETIME_FORMAT),
+                    type=eventtype,
+                    slt=0,
+                    amplitude='ALL',
+                    ampoper='eq',
+                    dump='bul',
+                    duree='ALL',
+                    graph='movsum',
+                    hideloc=0,
+                    located=0,
+                    locstatus=0,
+                    mc='MC3',
+                )
+                break
+            except Exception as e:
+                logger.error(e)
+                logger.info('Retrying in %ss...', self.retry_delay)
+                time.sleep(self.retry_delay)
+                content = None
 
-        if response['status'] != '200':
-            return None
         return content
 
     def get_mc3(self, eventdate, eventid=None, sc3id=None, eventtype=None):
