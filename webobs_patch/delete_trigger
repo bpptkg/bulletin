@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+# Copyright (c) 2021-present BPPTKG
+#
+# Project repository: https://gitlab.com/bpptkg/bulletin
+#
+# Send WEBOBS_DELETE_EVENT signal to the bulletin web services using
+# bpptkg-bulletinclient library. Required payload is event ID (eventid).
+# Operator name can also be specified.
+#
+# Arguments:
+#
+# $1 -> Event ID (eventid), e.g. 2021-07#3414.
+#
+# $2 -> Operator name, e.g. YUL.
+#
+
+echo "Event modified at $(date "+%Y-%m-%d %H:%M:%S UTC"). Action: WEBOBS_DELETE_EVENT, Event ID: $1, Operator: $2."
+
+bulletinclient WEBOBS_DELETE_EVENT --eventid "$1" --operator $2

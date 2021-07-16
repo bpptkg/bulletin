@@ -1,0 +1,29 @@
+#!/bin/bash
+#
+# Copyright (c) 2021-present BPPTKG
+#
+# Project repository: https://gitlab.com/bpptkg/bulletin
+#
+# Send WEBOBS_UPDATE_EVENT to the bulletin web services using
+# bpptkg-bulletinclient library.
+#
+# Arguments:
+#
+# $1 -> Event date, e.g. 2021-07-15 09:07:22.24.
+#
+# $2 -> Update flag, e.g. 2. Previously, this value was used by tg-alert to
+# execute update script. For current version, we don't use this value but for
+# compatibility reason.
+#
+# $3 -> SeisComP3 ID (sc3id), e.g. ://bpptkg2021nuqwku.
+#
+# $4 -> Operator name, e.g. YUL.
+#
+# $5 -> Event ID (eventid), e.g. 2021-07#3414.
+#
+# $6 -> Event type (eventtype), e.g. VTA, VTB.
+#
+
+echo "Event modified at $(date "+%Y-%m-%d %H:%M:%S UTC"). Action: WEBOBS_UPDATE_EVENT, Event date: $1, Flag: $2, SC3 ID: $3, Operator: $4, Event ID: $5, Event type: $6."
+
+bulletinclient WEBOBS_UPDATE_EVENT --eventdate "$1" --sc3id "$3" --operator $4 --eventtype $5 --eventid "$5"
