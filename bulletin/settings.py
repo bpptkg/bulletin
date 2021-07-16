@@ -1,7 +1,8 @@
 from pathlib import Path
 
-from decouple import Csv, config
 from corsheaders.defaults import default_headers
+from decouple import Csv, config
+from django.core import exceptions
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -238,4 +239,11 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 
 MOCK_SEISCOMP_SERVER = config('MOCK_SEISCOMP_SERVER', default=False, cast=bool)
-WEBOBS_FETCH_TIME_WAIT = config('WEBOBS_FETCH_TIME_WAIT', default=10, cast=int)
+if not DEBUG and MOCK_SEISCOMP_SERVER:
+    raise exceptions.ImproperlyConfigured(
+        'You have set MOCK_SEISCOMP_SERVER=True while DEBUG=False. '
+        'MOCK_SEISCOMP_SERVER only works in development environment when '
+        'DEBUG=True to prevent settings misconfiguration.')
+
+WEBOBS_UPDATE_EVENT_DELAY = config(
+    'WEBOBS_UPDATE_EVENT_DELAY', default=10, cast=int)
