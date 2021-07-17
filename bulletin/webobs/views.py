@@ -61,7 +61,10 @@ class WebObsEndpoint(Endpoint):
                 raise exceptions.MissingParameter(
                     'Missing eventdate parameter.')
 
-            eventdate = eventdate.astimezone(pytz.utc)
+            if eventdate.tzinfo is not None:
+                eventdate = eventdate.replace(tzinfo=pytz.utc)
+            else:
+                eventdate = pytz.utc.localize(eventdate)
 
             tasks.update_event.apply_async(
                 args=(eventdate, ),
