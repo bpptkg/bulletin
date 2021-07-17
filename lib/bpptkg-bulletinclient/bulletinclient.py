@@ -178,7 +178,7 @@ def parse_args():
         description='Bulletin web services Python client. '
                     '(Version {version})'.format(version=__version__))
 
-    default_url = 'http://192.168.0.43:6352/api/v1/webobs/'
+    default_url = 'http://192.168.0.43:9056/api/v1/webobs/'
     parser.add_argument(
         '-u', '--url',
         default=default_url,
