@@ -144,7 +144,7 @@ class FailedRequestStorage(object):
 
         if response is not None:
             content['response'] = {
-                'headers': response.headers,
+                'headers': dict(response.headers),
                 'links': response.links,
                 'ok': response.ok,
                 'reason': response.reason,
@@ -322,10 +322,11 @@ def main():
     try:
         response = requests.post(args.url, data)
         if response.ok:
-            print('Response:', response.json())
+            print('Response: {}'.format(response.json()))
             print('Action submitted.')
         else:
             print('Action failed to be submitted.')
+            print('Response: {}'.format(response.text))
 
             path = frstorage.store(data, response=response)
             print('Failed request data is stored in {}'.format(path))
