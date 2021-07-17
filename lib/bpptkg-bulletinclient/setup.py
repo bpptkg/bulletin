@@ -11,7 +11,7 @@ def read(filename):
 
 
 with io.open('bulletinclient.py', 'rt', encoding='utf-8') as f:
-    version = re.search(r"VERSION = '(.*?)'", f.read()).group(1)
+    version = re.search(r"__version__ = '(.*?)'", f.read()).group(1)
 
 
 description = 'Bulletin web services Python client.'
