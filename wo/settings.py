@@ -74,9 +74,9 @@ DAY_RANGE = config('DAY_RANGE', default=3, cast=int)
 if DAY_RANGE <= 0:
     raise ValueError('DAY_RANGE value must be greater than 0.')
 
-SEEDLINK_HOST = config('SEEDLINK_HOST', default='localhost')
+SEEDLINK_HOST = config('SEEDLINK_HOST', default='127.0.0.1')
 SEEDLINK_PORT = config('SEEDLINK_PORT', default=18000, cast=int)
-ARCLINK_HOST = config('ARCLINK_HOST', default='localhost')
+ARCLINK_HOST = config('ARCLINK_HOST', default='127.0.0.1')
 ARCLINK_PORT = config('ARCLINK_PORT', default=18001, cast=int)
 
 WEBOBS_USERNAME = config('WEBOBS_USERNAME')
