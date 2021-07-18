@@ -6,7 +6,7 @@ from celery.utils.log import get_task_logger
 from django.conf import settings
 from wo import visitor
 
-from . import models
+from . import schema
 
 logger = get_task_logger(__name__)
 
@@ -28,8 +28,8 @@ def update_event(self, eventdate, **kwargs):
     time.sleep(settings.WEBOBS_UPDATE_EVENT_DELAY)
 
     visitor.update_event(
-        models.engine,
-        models.Bulletin,
+        schema.engine,
+        schema.Bulletin,
         eventdate,
         **kwargs,
     )
@@ -44,8 +44,8 @@ def hide_event(self, eventid, **kwargs):
     Hide an event in the database.
     """
     visitor.hide_event(
-        models.engine,
-        models.Bulletin,
+        schema.engine,
+        schema.Bulletin,
         eventid,
         **kwargs,
     )
@@ -60,8 +60,8 @@ def restore_event(self, eventid, eventtype, **kwargs):
     Restore an event in the database.
     """
     visitor.restore_event(
-        models.engine,
-        models.Bulletin,
+        schema.engine,
+        schema.Bulletin,
         eventid,
         eventtype,
         **kwargs,
@@ -77,8 +77,8 @@ def delete_event(self, eventid, **kwargs):
     Delete an event in the database, i.e. soft delete.
     """
     visitor.delete_event(
-        models.engine,
-        models.Bulletin,
+        schema.engine,
+        schema.Bulletin,
         eventid,
         **kwargs,
     )

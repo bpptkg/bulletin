@@ -245,5 +245,12 @@ if not DEBUG and MOCK_SEISCOMP_SERVER:
         'MOCK_SEISCOMP_SERVER only works in development environment when '
         'DEBUG=True to prevent settings misconfiguration.')
 
+MOCK_WEBOBS_SERVER = config('MOCK_WEBOBS_SERVER', default=False, cast=bool)
+if not DEBUG and MOCK_WEBOBS_SERVER:
+    raise exceptions.ImproperlyConfigured(
+        'You have set MOCK_WEBOBS_SERVER=True while DEBUG=False. '
+        'MOCK_WEBOBS_SERVER only works in the development environment when '
+        'DEBUG=True to prevent settings misconfiguration.')
+
 WEBOBS_UPDATE_EVENT_DELAY = config(
     'WEBOBS_UPDATE_EVENT_DELAY', default=10, cast=int)

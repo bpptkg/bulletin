@@ -86,3 +86,7 @@ WEBOBS_HOST = config('WEBOBS_HOST', default='')
 # This variable can be used to mock `wo.clients.waveform.get_waveforms()`
 # function for testing purposes.
 GET_WAVEFORMS_FUNCTION = None
+
+# This variable can be use to set custom WebObs fetcher
+# `wo.clients.webobs.WebObsMC3Fetcher`.
+WEBOBS_MC3_FETCHER_CLASS = None

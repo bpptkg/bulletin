@@ -1,3 +1,0 @@
-recursive-exclude tests *
-include LICENSE
-include README.md

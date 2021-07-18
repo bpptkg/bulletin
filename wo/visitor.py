@@ -162,7 +162,11 @@ def _execute_action(
                 eventdate, eventid, sc3id, eventtype, operator)
 
     if action == WebObsAction.WEBOBS_UPDATE_EVENT:
-        fetcher = webobs.WebObsMC3Fetcher()
+        fetcher_class = settings.WEBOBS_MC3_FETCHER_CLASS
+        if fetcher_class is not None:
+            fetcher = fetcher_class()
+        else:
+            fetcher = webobs.WebObsMC3Fetcher()
         event = fetcher.get_mc3(eventdate, eventid=eventid, sc3id=sc3id,
                                 eventtype=eventtype)
 
