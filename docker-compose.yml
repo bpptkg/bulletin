@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+  app:
+    build: .
+    container_name: bulletin
+    restart: always
+    env_file:
+      - ./.env
+    ports:
+      - 8000:8000
+    volumes:
+      - ./storage/:/app/storage/
+    command: "gunicorn --workers 4 --bind 0.0.0.0:8000 bulletin.wsgi:application"
+
+  nginx:
+    image: nginx:1.17
+    container_name: bulletin_nginx
+    restart: always
+    ports:
+      - 9056:80
+    volumes:
+      - ./conf/docker/bulletin.conf:/etc/nginx/conf.d/bulletin.conf
+    depends_on:
+      - app
+
+  memcached:
+    image: memcached
+    container_name: bulletin_memcached
+    restart: always
+    expose:
+      - "11211"
+    entrypoint:
+      - memcached
+      - -m 64
+    depends_on:
+      - app
+
+  redis:
+    image: redis:latest
+    container_name: bulletin_redis
+
+  celery:
+    build: .
+    container_name: bulletin_celery
+    restart: always
+    env_file:
+      - ./.env
+    volumes:
+      - ./storage/:/app/storage/
+    command: "celery -A bulletin worker --loglevel=INFO"
+    depends_on:
+      - redis
+      - app
