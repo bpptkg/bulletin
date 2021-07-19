@@ -14,7 +14,7 @@ with io.open('bulletinclient.py', 'rt', encoding='utf-8') as f:
     version = re.search(r"__version__ = '(.*?)'", f.read()).group(1)
 
 
-description = 'Bulletin web services Python client.'
+description = 'Bulletin web services Python client'
 
 setup(
     name='bpptkg-bulletinclient',
