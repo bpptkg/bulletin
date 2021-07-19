@@ -28,6 +28,7 @@ FAILED_REQUEST_DIR = os.path.join(BULLETIN_DIR, 'failedrequest')
 if not os.path.isdir(FAILED_REQUEST_DIR):
     os.makedirs(FAILED_REQUEST_DIR)
 
+DEFAULT_URL = 'http://192.168.0.43:9056/api/v1/webobs/'
 
 datetime_re = re.compile(
     r'(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})'
@@ -178,12 +179,11 @@ def parse_args():
         description='Bulletin web services Python client. '
                     '(Version {version})'.format(version=__version__))
 
-    default_url = 'http://192.168.0.43:9056/api/v1/webobs/'
     parser.add_argument(
         '-u', '--url',
-        default=default_url,
+        default=DEFAULT_URL,
         help='Bulletin WebObs endpoint URL. '
-             'Default to {url}.'.format(url=default_url))
+             'Default to {url}.'.format(url=DEFAULT_URL))
 
     parser.add_argument(
         'action',
