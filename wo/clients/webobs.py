@@ -2,6 +2,7 @@ import datetime
 import logging
 import time
 
+import pandas as pd
 from webobsclient import MC3Client
 from webobsclient.parser import MC3Parser
 
@@ -75,6 +76,16 @@ class WebObsMC3Fetcher:
             self.parser = MC3Parser()
 
     def request_mc3(self, start, end, eventtype='ALL'):
+        """
+        Request MC3 bulletin defined by start time, end time, and optional
+        eventtype.
+
+        Start time and end time must be a datetime.datetime type and in UTC time
+        zone.
+
+        If request failed, it will try until max retries reached. If all retries
+        failed, return None.
+        """
         logger.info('Fetching MC3 bulletin (%s)...', self.client.api.host)
         logger.info('Time range (UTC): %s to %s', start, end)
 
@@ -105,6 +116,10 @@ class WebObsMC3Fetcher:
         return content
 
     def get_mc3(self, eventdate, eventid=None, sc3id=None, eventtype=None):
+        """
+        Get event from WebObs MC3 bulletin defined by eventdate (UTC) and
+        matching criteria (eventid, sc3id, or eventtype).
+        """
         start = eventdate - datetime.timedelta(seconds=10)
         end = eventdate + datetime.timedelta(seconds=10)
 
@@ -134,3 +149,29 @@ class WebObsMC3Fetcher:
         if not event.empty:
             return event.to_dict(orient='records')[0]
         return None
+
+    def fetch_mc3_as_df(self, start, end, eventtype='ALL'):
+        """
+        Request MC3 bulletin defined by start time, end time, and optional
+        eventtype returned as Pandas DataFrame.
+        """
+        content = self.request_mc3(start, end, eventtype=eventtype)
+        if content is None:
+            return pd.DataFrame()
+
+        # Filter exact to allow only eventdate in the particular time range.
+        df = self.parser.to_df(content)
+        df = df.where((df['eventdate'] >= start) &
+                      (df['eventdate'] < end))
+        df.dropna(how='any', inplace=True, subset=['eventdate'])
+        return df
+
+    def fetch_mc3_as_dict(self, start, end, eventtype='ALL'):
+        """
+        Request MC3 bulletin defined by start time, end time, and optional
+        eventtype returned as dictionary.
+        """
+        df = self.fetch_mc3_as_df(start, end, eventtype=eventtype)
+        if df.empty:
+            return {}
+        return df.to_dict(orient='records')

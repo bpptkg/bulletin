@@ -15,3 +15,4 @@ btbb.sh
 dist/
 *.egg-info
 db.sqlite3
+celerybeat-schedule

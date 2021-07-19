@@ -140,6 +140,80 @@ class SimpleEventVisitor(SingleInstance):
                     logger.error('Event value failed to be updated.')
 
 
+def process_event_and_updatedb(engine, event, *, dry_run=False):
+    """
+    Process event by calculating necessary fields and update to database. If
+    dry_run is True, don't update the database.
+    """
+
+    # Calculate magnitude info.
+    start = UTCDateTime(event['eventdate'])
+    if event['duration'] is None or pd.isna(event['duration']):
+        # Set default duration to 30 seconds.
+        duration = 30.0
+    else:
+        duration = float(event['duration'])
+
+    end = start + duration
+
+    get_waveforms_func = settings.GET_WAVEFORMS_FUNCTION
+    if get_waveforms_func is not None:
+        if not callable(get_waveforms_func):
+            raise ValueError(
+                'GET_WAVEFORMS_FUNCTION must be a callable function '
+                'instead of type of {}'.format(type(get_waveforms_func)))
+        stream = get_waveforms_func(start, end)
+    else:
+        stream = get_waveforms(start, end)
+    if stream is not None:
+        logger.info(stream.__str__(extended=True))
+
+    magnitudes = compute_magnitude_all(stream)
+    logger.info('Magnitude info: %s', magnitudes)
+    event.update(magnitudes)
+
+    # Insert to database.
+    logger.info('Event data: %s', event)
+    if not event:
+        logger.warning('Event data is empty.')
+
+    if dry_run:
+        logger.info('Using dry run. Event is not inserted to database.')
+    else:
+        ok = ops.mysql_upsert(engine, event)
+        if ok:
+            logger.info('Event data successfully updated.')
+        else:
+            logger.error('Event data failed to be updated.')
+
+
+def sync_webobs_and_bulletin(engine, table, events, *, dry_run=False):
+    """
+    Synchronize events between webobs and bulletin database. If any of the event
+    not exists or has different eventtype, process the event and update the
+    database.
+    """
+    for event_wo, event_db in query.filter_exact(engine, table, events):
+        if event_db is None:
+            eventtype_db = None
+        else:
+            eventtype_db = event_db['eventtype']
+
+        logger.info(
+            'Found event: ('
+            'eventid: {}, '
+            'eventdate[utc]: {}, '
+            'type[wo]: {}, '
+            'type[db]: {})'.format(
+                event_wo['eventid'],
+                event_wo['eventdate'],
+                event_wo['eventtype'],
+                eventtype_db)
+        )
+
+        process_event_and_updatedb(engine, event_wo, dry_run=dry_run)
+
+
 def _execute_action(
         engine,
         table,
@@ -177,44 +251,7 @@ def _execute_action(
             return
         logger.info('Matched event from WebObs MC3: %s', event)
 
-        # Calculate magnitude info.
-        start = UTCDateTime(event['eventdate'])
-        if event['duration'] is None or pd.isna(event['duration']):
-            duration = 30.0
-        else:
-            duration = float(event['duration'])
-
-        end = start + duration
-
-        get_waveforms_func = settings.GET_WAVEFORMS_FUNCTION
-        if get_waveforms_func is not None:
-            if not callable(get_waveforms_func):
-                raise ValueError(
-                    'GET_WAVEFORMS_FUNCTION value must be a function '
-                    'instead of type of {}'.format(type(get_waveforms_func)))
-            stream = get_waveforms_func(start, end)
-        else:
-            stream = get_waveforms(start, end)
-        if stream is not None:
-            logger.info(stream.__str__(extended=True))
-
-        magnitudes = compute_magnitude_all(stream)
-        logger.info('Magnitude info: %s', magnitudes)
-        event.update(magnitudes)
-
-        # Insert to database.
-        logger.info('Event data: %s', event)
-        if not event:
-            logger.warning('Event data is empty.')
-
-        if dry_run:
-            logger.info('Using dry run. Event is not inserted to database.')
-        else:
-            ok = ops.mysql_upsert(engine, event)
-            if ok:
-                logger.info('Event data successfully updated.')
-            else:
-                logger.error('Event data failed to be updated.')
+        process_event_and_updatedb(engine, event, dry_run=dry_run)
 
     elif action == WebObsAction.WEBOBS_HIDE_EVENT:
         if eventid is None:

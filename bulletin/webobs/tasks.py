@@ -1,10 +1,13 @@
+import datetime
 import time
 
 from bulletin.celery import app
-from celery.decorators import task
+from celery.schedules import crontab
 from celery.utils.log import get_task_logger
 from django.conf import settings
+from django.utils import timezone
 from wo import visitor
+from wo.clients.webobs import WebObsMC3Fetcher
 
 from . import schema
 
@@ -81,4 +84,35 @@ def delete_event(self, eventid, **kwargs):
         schema.Bulletin,
         eventid,
         **kwargs,
+    )
+
+
+@app.task(name='webobs_sync_events')
+def sync_events(**kwargs):
+    """
+    Synchronize events between WebObs MC3 and seismic bulletin database.
+    """
+    fetcher = WebObsMC3Fetcher()
+    now = timezone.now()
+    start = datetime.datetime(now.year, now.month, now.day, tzinfo=now.tzinfo)
+    events = fetcher.fetch_mc3_as_dict(start, now)
+    if events:
+        visitor.sync_webobs_and_bulletin(
+            schema.engine,
+            schema.Bulletin,
+            events,
+            **kwargs,
+        )
+
+
+@app.on_after_finalize.connect
+def setup_periodic_tasks(sender, **kwargs):
+    """
+    Register periodic tasks.
+    """
+
+    sender.add_periodic_task(
+        crontab(minute=0),
+        sync_events.s(),
+        name='sync events every 1 hour'
     )
