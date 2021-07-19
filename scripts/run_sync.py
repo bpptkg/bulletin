@@ -67,12 +67,15 @@ def main():
         end = date.now(aware=True)
         start = end - datetime.timedelta(days=settings.DAY_RANGE)
 
-    logger.info('Time range (local): %s to %s', start, end)
     starttime = date.to_utc(start)
     endtime = date.to_utc(end)
+    logger.info('Time range [local]: %s to %s', start, end)
+    logger.info('Time range [utc]: %s to %s', starttime, endtime)
 
     try:
-        events = webobs.fetch_mc3(starttime, endtime, eventtype=args.eventtype)
+        fetcher = webobs.WebObsMC3Fetcher()
+        events = fetcher.fetch_mc3_as_dict(
+            starttime, endtime, eventtype=args.eventtype)
         logger.info('Number of events: %s', len(events))
 
         visitor = SimpleEventVisitor(

@@ -8,51 +8,8 @@ from webobsclient.parser import MC3Parser
 
 from .. import constants
 from ..settings import WEBOBS_HOST, WEBOBS_PASSWORD, WEBOBS_USERNAME
-from ..utils import date
 
 logger = logging.getLogger(__name__)
-
-
-def fetch_mc3(start, end, eventtype='ALL'):
-    """
-    Fetch WebObs MC3 bulletin by particular time range and eventtype, and then
-    return as dictionary.
-
-    Note that starttime and endtime are using UTC time zone.
-
-    If error occurred during request, it will return empty list.
-    """
-
-    client = MC3Client(username=WEBOBS_USERNAME, password=WEBOBS_PASSWORD)
-
-    if WEBOBS_HOST:
-        client.api.host = WEBOBS_HOST
-
-    logger.info('Fetching MC3 bulletin (%s)...', client.api.host)
-    logger.info('Start time (UTC): %s', start)
-    logger.info('End time (UTC): %s', end)
-
-    response, content = client.request(
-        starttime=start.strftime(constants.DATETIME_FORMAT),
-        endtime=end.strftime(constants.DATETIME_FORMAT),
-        type=eventtype,
-        amplitude='ALL',
-        ampoper='eq',
-        dump='bul',
-        duree='ALL',
-        graph='movsum',
-        hideloc=0,
-        located=0,
-        locstatus=0,
-        mc='MC3',
-        slt=0,
-    )
-
-    if response['status'] != '200':
-        return []
-
-    parser = MC3Parser()
-    return parser.to_dict(content)
 
 
 class WebObsMC3Fetcher:
