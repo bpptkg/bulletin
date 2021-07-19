@@ -120,13 +120,13 @@ class WebObsMC3Fetcher:
         if df.empty:
             return None
 
-        if eventid is not None:
-            event = df.loc[df['eventid'] == eventid]
+        if sc3id is not None:
+            event = df.loc[df['seiscompid'] == sc3id]
             if not event.empty:
                 return event.to_dict(orient='records')[0]
 
-        if sc3id is not None:
-            event = df.loc[df['seiscompid'] == sc3id]
+        if eventid is not None:
+            event = df.loc[df['eventid'] == eventid]
             if not event.empty:
                 return event.to_dict(orient='records')[0]
 
