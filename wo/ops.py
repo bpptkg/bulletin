@@ -48,7 +48,17 @@ def delete_event(engine, table, eventid, operator):
 
 def mysql_upsert(engine, data):
     """
-    Insert new data to database model or update the value if primary key exists.
+    Insert new event to database model or update the event if primary key
+    exists.
+
+    :param engine: SQLAlchemy engine, e.g. an instance created by
+    create_engine() function.
+
+    :param data: Event data, can be a dictionary or a list of dictionary. Note
+    that event date must be in the UTC time zone. This function will do
+    conversion to local time zone automatically.
+
+    :returns: True if upsert succeed, otherwise return False.
     """
     insert_query = r"""
         INSERT INTO bulletin (
