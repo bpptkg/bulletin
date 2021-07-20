@@ -1,6 +1,8 @@
 services:
   - name: mysql:5.7
     alias: mysql-seismic_bulletin
+  - name: mysql:5.7
+    alias: mysql-bulletin
   - redis:latest
 
 variables:
