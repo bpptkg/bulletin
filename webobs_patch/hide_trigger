@@ -23,11 +23,11 @@
 #
 
 if [ $2 == 'NULL' ]; then
-    echo "Event modified at $(date "+%Y-%m-%d %H:%M:%S UTC"). Action: WEBOBS_HIDE_EVENT, Event ID: $1, Operator: $3."
+    echo -e "\nEvent modified at $(date "+%Y-%m-%d %H:%M:%S UTC"). Action: WEBOBS_HIDE_EVENT, Event ID: $1, Operator: $3."
 
     bulletinclient WEBOBS_HIDE_EVENT --eventid "$1" --operator $3
 else
-    echo "Event modified at $(date "+%Y-%m-%d %H:%M:%S UTC"). Action: WEBOBS_RESTORE_EVENT, Event ID: $1, Event type: $2, Operator: $3."
+    echo -e "\nEvent modified at $(date "+%Y-%m-%d %H:%M:%S UTC"). Action: WEBOBS_RESTORE_EVENT, Event ID: $1, Event type: $2, Operator: $3."
 
     bulletinclient WEBOBS_RESTORE_EVENT --eventid "$1" --eventtype $2 --operator $3
 fi

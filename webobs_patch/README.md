@@ -1,7 +1,7 @@
 # WebObs
 
-This directory contains code patches to keep WebObs MC3 and BPPTKG
-seismic_bulletin database in sync.
+This directory contains code patches to keep WebObs MC3 and BPPTKG seismic
+bulletin database in sync.
 
 ## Instructions
 
@@ -12,17 +12,18 @@ seismic_bulletin database in sync.
 
   If your bulletin web services URL differ from the libary provided, you can
   override the value by adding `--url <bulletin_webobs_endpoint_url>` option in
-  the command arguments. You can view default URL endpoint by viewing help
-  command:
+  the command arguments. You can view default URL endpoint by viewing command
+  help:
 
       bulletinclient -h
 
 - Modify trigger scripts `update_trigger`, `hide_trigger`, `delete_trigger`
-  according to your need. Default command options provided should be sufficient.
+  according to your need. The default command options provided should be
+  sufficient.
 
 - Copy `update_trigger`, `hide_trigger`, `delete_trigger` to
   `{WEBOBS_ROOT}/CODE/shells/`. Example `WEBOBS_ROOT` directory is
-  `/opt/webobs/`.
+  `/opt/webobs/` (default provided in the scripts).
 
 - Add the following code to the end block of
   `{WEBOBS_ROOT}/CODE/cgi-bin/editMC3.pl` file. For example we use `WEBOBS_ROOT`
@@ -61,9 +62,9 @@ elsif ($delete == 2) {
 # ============================== END BLOCK =====================================
 ```
 
-If you add synchronous code in the tigger scripts, it may block current
-operation. It can give an effect of longer loading in web browser when operator
-try to pick or modify an event.
+If you add synchronous code in the trigger scripts, it may block current
+operation. It can make longer loading in web browser when operator try to pick
+or modify an event.
 
 ## How It Works
 

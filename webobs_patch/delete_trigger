@@ -15,6 +15,6 @@
 # $2 -> Operator name, e.g. YUL.
 #
 
-echo "Event modified at $(date "+%Y-%m-%d %H:%M:%S UTC"). Action: WEBOBS_DELETE_EVENT, Event ID: $1, Operator: $2."
+echo -e "\nEvent modified at $(date "+%Y-%m-%d %H:%M:%S UTC"). Action: WEBOBS_DELETE_EVENT, Event ID: $1, Operator: $2."
 
 bulletinclient WEBOBS_DELETE_EVENT --eventid "$1" --operator $2
