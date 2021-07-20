@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from sqlalchemy import create_engine
 from sqlalchemy_utils import create_database, database_exists
 from webobsclient.contrib.bpptkg.db.seismic_bulletin import Base

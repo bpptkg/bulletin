@@ -20,7 +20,7 @@ logger = get_task_logger(__name__)
     max_retries=5)
 def update_event(self, eventdate, **kwargs):
     """
-    Update an event in the database.
+    Update or create an event in the database.
     """
 
     # For a new event, WebObs may still generate eventid and synchronize the
@@ -77,7 +77,7 @@ def restore_event(self, eventid, eventtype, **kwargs):
     max_retries=5)
 def delete_event(self, eventid, **kwargs):
     """
-    Delete an event in the database, i.e. soft delete.
+    Delete an event in the database.
     """
     visitor.delete_event(
         schema.engine,
