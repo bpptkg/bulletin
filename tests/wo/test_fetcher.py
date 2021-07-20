@@ -1,7 +1,7 @@
-import datetime
 import os
 import unittest
 
+from dateutil.parser import parse
 from webobsclient import MC3Client
 
 from wo.clients.webobs import WebObsMC3Fetcher
@@ -29,8 +29,7 @@ class WebObsMC3FetcherTest(unittest.TestCase):
 
     def test_query_event_by_eventdate(self):
 
-        eventdate = datetime.datetime.fromisoformat(
-            '2021-07-08T00:02:00.240000+00:00')
+        eventdate = parse('2021-07-08T00:02:00.240000+00:00')
         event = self.fetcher.get_mc3(eventdate)
 
         self.assertIsNotNone(event)
@@ -38,8 +37,7 @@ class WebObsMC3FetcherTest(unittest.TestCase):
         self.assertEqual(event['eventtype'], 'ROCKFALL')
 
     def test_query_event_by_eventid(self):
-        eventdate = datetime.datetime.fromisoformat(
-            '2021-07-08T00:04:19.000+00:00')
+        eventdate = parse('2021-07-08T00:04:19.000+00:00')
 
         event = self.fetcher.get_mc3(eventdate, eventid='2021-07#2381')
 
@@ -48,8 +46,7 @@ class WebObsMC3FetcherTest(unittest.TestCase):
         self.assertEqual(event['eventtype'], 'ROCKFALL')
 
     def test_query_event_by_sc3id(self):
-        eventdate = datetime.datetime.fromisoformat(
-            '2021-07-08T00:10:11.880000+00:00')
+        eventdate = parse('2021-07-08T00:10:11.880000+00:00')
 
         event = self.fetcher.get_mc3(eventdate, sc3id='://bpptkg2021nhcvwk')
 

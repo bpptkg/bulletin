@@ -1,10 +1,10 @@
-import datetime
 import logging
 import logging.config
 import os
 import unittest
 from unittest.mock import patch
 
+from dateutil.parser import parse
 from obspy import read
 from sqlalchemy import create_engine
 from webobsclient.contrib.bpptkg.db.seismic_bulletin import Bulletin
@@ -45,8 +45,7 @@ class ExecActionTest(unittest.TestCase):
         mock_restore_event.return_value = True
 
         engine = create_engine(settings.DATABASE_ENGINE)
-        eventdate = datetime.datetime.fromisoformat(
-            '2021-07-08T00:02:00.240000+00:00')
+        eventdate = parse('2021-07-08T00:02:00.240000+00:00')
 
         # Lazy import patched methods.
         from wo.visitor import _execute_action
