@@ -2,15 +2,20 @@ import argparse
 import datetime
 import logging
 import logging.config
+import os
+import sys
 
 from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 from webobsclient.contrib.bpptkg.db.seismic_bulletin import Base, Bulletin
-from wo import settings
-from wo.clients import webobs
-from wo.singleton import SingleInstanceException
-from wo.utils import date
-from wo.visitor import SimpleEventVisitor
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if True:
+    from wo import settings
+    from wo.clients import webobs
+    from wo.singleton import SingleInstanceException
+    from wo.utils import date
+    from wo.visitor import SimpleEventVisitor
 
 logger = logging.getLogger(__name__)
 
