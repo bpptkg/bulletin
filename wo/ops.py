@@ -141,15 +141,20 @@ def mysql_upsert(engine, data):
     ]
 
     logger.info('Preparing event data entry.')
-    df = pd.DataFrame([data, ])
+    if isinstance(data, dict):
+        df = pd.DataFrame([data, ])
+    else:
+        df = pd.DataFrame(data)
 
     # Convert any timestamp column to local time zone.
     df['eventdate'] = df['eventdate'].dt.tz_convert(
         TIMEZONE).dt.tz_localize(None)
     df['timestamp'] = df['timestamp'].dt.tz_convert(
         TIMEZONE).dt.tz_localize(None)
-    df['eventdate'] = df['eventdate'].astype(str)
-    df['timestamp'] = df['timestamp'].astype(str)
+
+    datetime_format = '%Y-%m-%d %H:%M:%S'
+    df['eventdate'] = df['eventdate'].dt.strftime(datetime_format)
+    df['timestamp'] = df['timestamp'].dt.strftime(datetime_format)
 
     df = df.astype(object).where((pd.notnull(df)), None)
 

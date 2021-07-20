@@ -5,7 +5,6 @@ import unittest
 from webobsclient import MC3Client
 
 from wo.clients.webobs import WebObsMC3Fetcher
-from wo.utils import date
 
 DATA_DIR = os.path.join(os.path.dirname(
     os.path.dirname(os.path.abspath(__file__))), 'data')
