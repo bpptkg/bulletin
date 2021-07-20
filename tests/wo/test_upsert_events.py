@@ -1,5 +1,6 @@
 import os
 import unittest
+import warnings
 
 from decouple import config
 from obspy import read
@@ -16,8 +17,24 @@ DATA_DIR = os.path.join(os.path.dirname(
 
 
 class UpsertEventsTest(unittest.TestCase):
+    """
+    Verify that the data inserted to database were correct, particularly for UTC
+    to local time zone datetime conversion.
+    """
 
     def test_upsert_events(self):
+        # Run this test only on CI/CD environment to prevent data overwrite in
+        # the seismic bulletin database.
+        cicd = config('CICD', default=False, cast=bool)
+        if not cicd:
+            warnings.warn('You are running test_upsert_events() '
+                          'not in the CI/CD environment. This will cause '
+                          'accidental effect to the seismic bulletin '
+                          'database. Make sure you set CICD=True in your '
+                          'testing environment settings. Particularly in the '
+                          'tox.ini setenv settings.')
+            return
+
         engine_url = config('SEISMIC_BULLETIN_ENGINE')
         engine = create_engine(engine_url)
         Base.prepare(engine, reflect=True)
