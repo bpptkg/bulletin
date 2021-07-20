@@ -2,12 +2,27 @@ import logging
 
 import pandas as pd
 from webobsclient.contrib.bpptkg.db.sessions import session_scope
+
 from .settings import TIMEZONE
 
 logger = logging.getLogger(__name__)
 
 
 def hide_event(engine, table, eventid, operator):
+    """
+    Hide an event in the database.
+
+    :param engine: SQLAlchemy engine, e.g. an instance created by
+    create_engine() function.
+
+    :param table: SQLAlchemy database table or model.
+
+    :param eventid: Event ID, e.g. 2021-07#3414.
+
+    :param operator: Operator name, e.g. YUL.
+
+    :returns: True if hide succeed, otherwise return False.
+    """
     with session_scope(engine) as session:
         queryset = session.query(table).get(eventid)
         if queryset is not None:
@@ -19,6 +34,22 @@ def hide_event(engine, table, eventid, operator):
 
 
 def restore_event(engine, table, eventid, eventtype, operator):
+    """
+    Restore an event in the database.
+
+    :param engine: SQLAlchemy engine, e.g. an instance created by
+    create_engine() function.
+
+    :param table: SQLAlchemy database table or model.
+
+    :param eventid: Event ID, e.g. 2021-07#3414.
+
+    :param eventtype: Event type, e.g. VTA, VTB, MP.
+
+    :param operator: Operator name, e.g. YUL.
+
+    :returns: True if restore succeed, otherwise return False.
+    """
     with session_scope(engine) as session:
         queryset = session.query(table).get(eventid)
         if queryset is not None:
@@ -35,6 +66,17 @@ def delete_event(engine, table, eventid, operator):
     delete an event in the database to prevent accidental deletion.
 
     Setting eventtype to None is sufficient to resemble event deletion.
+
+    :param engine: SQLAlchemy engine, e.g. an instance created by
+    create_engine() function.
+
+    :param table: SQLAlchemy database table or model.
+
+    :param eventid: Event ID, e.g. 2021-07#3414.
+
+    :param operator: Operator name, e.g. YUL.
+
+    :returns: True if delete succeed, otherwise return False.
     """
     with session_scope(engine) as session:
         queryset = session.query(table).get(eventid)
