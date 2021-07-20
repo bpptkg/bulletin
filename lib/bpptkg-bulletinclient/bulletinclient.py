@@ -14,7 +14,7 @@ import uuid
 
 import requests
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 __author__ = 'Indra Rudianto'
 __license__ = 'MIT'
 __copyright__ = 'Copyright (c) 2021-present BPPTKG'
@@ -115,7 +115,7 @@ class FailedRequestStorage(object):
         else:
             self.storagedir = FAILED_REQUEST_DIR
 
-    def store(self, data, *, gid=None, response=None, exc=None):
+    def store(self, data, gid=None, response=None, exc=None):
         """
         Store data to the storage directory.
 
