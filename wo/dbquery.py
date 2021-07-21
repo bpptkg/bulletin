@@ -67,9 +67,10 @@ def reverse_filter_exact(engine, table, wo_events, start, end, eventtype=None):
 
         logger.info('Fetched %s events from database.', len(db_events))
 
+        eventids = set(df['eventid'])
         for event in db_events:
             eventid = event['eventid']
-            if eventid not in df['eventid']:
+            if eventid not in eventids:
                 yield (event, None)
             else:
                 matched_event = df.loc[
