@@ -19,21 +19,23 @@ if True:
 
 logger = logging.getLogger(__name__)
 
+__version__ = '0.3.0'
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='Run WebObs to seismic bulletin database '
-        'synchronization.')
+        description='Run WebObs MC3 bulletin to seismic bulletin database '
+                    'synchronization. (Version {})'.format(__version__))
 
     parser.add_argument(
         '-s', '--start',
         help="Start time of time window in 'YYYY-mm-dd' "
-        "or 'YYYY-mm-dd HH:MM:SS' format (Asia/Jakarta time zone).")
+             "or 'YYYY-mm-dd HH:MM:SS' format (Asia/Jakarta time zone).")
 
     parser.add_argument(
         '-e', '--end',
         help="End time of time window in 'YYYY-mm-dd' "
-        "or 'YYYY-mm-dd HH:MM:SS' format (Asia/Jakarta time zone).")
+             "or 'YYYY-mm-dd HH:MM:SS' format (Asia/Jakarta time zone).")
 
     parser.add_argument(
         '-i', '--eventtype',
@@ -53,7 +55,14 @@ def parse_args():
     parser.add_argument(
         '-p', '--print-only',
         action='store_true',
-        help='Print events that have not been synched yet.')
+        help='Print events that have not been synched yet and '
+             'do not process the events.')
+
+    parser.add_argument(
+        '-r', '--reverse',
+        action='store_true',
+        help='Reverse sync, i.e. synchronize seismic database '
+             'to WebObs MC3 bulletin.')
 
     return parser.parse_args()
 
@@ -91,10 +100,14 @@ def main():
             skip_mag_calc=args.skip_mag_calc,
         )
 
-        if args.print_only:
-            visitor.print_events(events)
+        if args.reverse:
+            if args.print_only:
+                visitor.reverse_print_events(events)
         else:
-            visitor.process_events(events)
+            if args.print_only:
+                visitor.print_events(events)
+            else:
+                visitor.process_events(events)
 
     except SingleInstanceException as e:
         logger.error(e)

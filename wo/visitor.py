@@ -4,13 +4,12 @@ import pandas as pd
 from obspy import UTCDateTime
 from webobsclient.contrib.bpptkg.db import query
 
-from . import ops, settings
+from . import dbquery, ops, settings
 from .actions import WebObsAction
 from .clients import webobs
 from .clients.waveform import get_waveforms
 from .magnitude import compute_magnitude_all
 from .singleton import SingleInstance
-from .utils import date
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +28,8 @@ class SimpleEventVisitor(SingleInstance):
     def print_events(self, events):
         """
         Print all events that have been not synched between WebObs and database.
+
+        :param events: List of dictionary of WebObs events.
         """
         for event, result in query.filter_exact(
             self.engine,
@@ -46,7 +47,7 @@ class SimpleEventVisitor(SingleInstance):
 
             logger.info(
                 'Found event: %s',
-                '(ID: {}, eventdate[local]: {}, type[webobs]: {}, '
+                '(ID: {}, eventdate[local]: {}, type[wo]: {}, '
                 'type[db]: {})'.format(
                     eventid,
                     eventdate,
@@ -55,12 +56,42 @@ class SimpleEventVisitor(SingleInstance):
                 )
             )
 
+    def reverse_print_events(self, events):
+        """
+        Print all events in the database that are not in the WebObs MC3
+        bulletin.
+
+        :param events: List of dictionary of WebObs events.
+        """
+        for event, wo_event in dbquery.reverse_filter_exact(
+            self.engine,
+            self.table,
+            events,
+        ):
+            if wo_event is None:
+                eventtype_wo = None
+            else:
+                eventtype_wo = wo_event['eventtype']
+
+            logger.info(
+                'Found event: %s',
+                '(ID: {}, eventdate[local]: {}, type[db]: {}, '
+                'type[wo]: {})'.format(
+                    event['eventid'],
+                    event['eventdate'],
+                    event['eventtype'],
+                    eventtype_wo,
+                )
+            )
+
     def filter_events(self, events):
         """
         Filter any event that has not been synched between WebObs and database.
+
+        :param events: List of dictionary of WebObs events.
         """
         results = []
-        for event, result in query.filter_exact(
+        for event, _ in query.filter_exact(
             self.engine,
             self.table,
             events,
@@ -73,6 +104,8 @@ class SimpleEventVisitor(SingleInstance):
         """
         Process all events that have not been synched between WebObs and
         database.
+
+        :param events: List of dictionary of WebObs events.
         """
         for event, result in query.filter_exact(
                 self.engine, self.table, events):
@@ -89,7 +122,7 @@ class SimpleEventVisitor(SingleInstance):
 
             logger.info(
                 'Found event: %s',
-                '(ID: {}, eventdate[local]: {}, type[webobs]: {}, '
+                '(ID: {}, eventdate[local]: {}, type[wo]: {}, '
                 'type[db]: {})'.format(
                     eventid,
                     eventdate,
