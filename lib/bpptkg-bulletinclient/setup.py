@@ -33,7 +33,7 @@ setup(
             'bulletinclient = bulletinclient:main',
         ]
     },
-    install_requires=['requests'],
+    install_requires=['requests', 'pytz'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',

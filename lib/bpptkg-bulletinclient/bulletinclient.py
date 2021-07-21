@@ -12,9 +12,10 @@ import re
 import sys
 import uuid
 
+import pytz
 import requests
 
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 __author__ = 'Indra Rudianto'
 __license__ = 'MIT'
 __copyright__ = 'Copyright (c) 2021-present BPPTKG'
@@ -37,10 +38,13 @@ datetime_re = re.compile(
     r'(?P<tzinfo>Z|[+-]\d{2}(?::?\d{2})?)?$'
 )
 
+# UTC time zone as a tzinfo instance.
+utc = pytz.utc
+
 
 def get_fixed_timezone(offset):
     """Return a tzinfo instance with a fixed offset from UTC."""
-    if isinstance(offset, timedelta):
+    if isinstance(offset, datetime.timedelta):
         offset = offset.total_seconds() // 60
     sign = '-' if offset < 0 else '+'
     hhmm = '%02d%02d' % divmod(abs(offset), 60)
@@ -120,11 +124,13 @@ class FailedRequestStorage(object):
         Store data to the storage directory.
 
         Every data stored will be given global unique identifier (gid),
-        basically using uuid4. You can also pass custom gid value in the keyword
-        argument.
+        basically using uuid4. You can also pass your custom gid value in the
+        keyword arguments.
 
-        Error message (errmsg) can also be passed to know why the request
-        failed.
+        Request response can also be passed to store the response data from the
+        web services.
+
+        Exception (exc) can also be passed to know why the request failed.
         """
         if gid is None:
             uid = uuid.uuid4().hex
@@ -221,7 +227,7 @@ def parse_args():
 
 def validate_arguments(args):
     if args.action not in WebObsAction.ALL:
-        print("Error: Unrecognize action name: '{}'. "
+        print("Error: Unrecognized action name: '{}'. "
               "Supported action names are {}."
               "".format(args.action, WebObsAction.ALL),
               file=sys.stderr)
@@ -329,13 +335,13 @@ def main():
             print('Response: {}'.format(response.text))
 
             path = frstorage.store(data, response=response)
-            print('Failed request data is stored in {}'.format(path))
+            print('Failed request data was stored in {}'.format(path))
     except requests.exceptions.RequestException as err:
         print(err)
         print('Action failed to be submitted.')
 
         path = frstorage.store(data, exc=str(err))
-        print('Failed request data is stored in {}'.format(path))
+        print('Failed request data was stored in {}'.format(path))
 
 
 if __name__ == '__main__':
