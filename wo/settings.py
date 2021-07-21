@@ -1,5 +1,6 @@
 import os
 import sys
+import warnings
 
 from decouple import config
 
@@ -15,6 +16,13 @@ LOG_DIR = os.path.join(STORAGE_DIR, 'logs')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 DATABASE_ENGINE = config('SEISMIC_BULLETIN_ENGINE')
+if not DATABASE_ENGINE.startswith('mysql'):
+    warnings.warn('You are not using MySQL database on '
+                  'SEISMIC_BULLETIN_ENGINE URL. The application may not '
+                  'function properly if you are using database other than '
+                  'MySQL that is supported by current version. Proceed at '
+                  'your own risk.')
+
 MIGRATED = config('MIGRATED', default=True, cast=bool)
 CONN_MAX_AGE = config('CONN_MAX_AGE', default=60*60, cast=int)
 MSD_EXT = '.msd'
