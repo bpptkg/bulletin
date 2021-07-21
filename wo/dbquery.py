@@ -9,7 +9,7 @@ from .settings import TIMEZONE
 logger = logging.getLogger(__name__)
 
 
-def reverse_filter_exact(engine, table, wo_events, start, end):
+def reverse_filter_exact(engine, table, wo_events):
     """
     Generator function to check if particular event not exists (event ID not
     exists, or event ID exists but eventtype differ) in the webobs.
