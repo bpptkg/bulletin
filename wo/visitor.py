@@ -56,17 +56,26 @@ class SimpleEventVisitor(SingleInstance):
                 )
             )
 
-    def reverse_print_events(self, events):
+    def reverse_print_events(self, events, start, end, eventtype=None):
         """
         Print all events in the database that are not in the WebObs MC3
         bulletin.
 
         :param events: List of dictionary of WebObs events.
+
+        :param start: Start time to query database in UTC time zone.
+
+        :param end: End time to query database in UTC time zone.
+
+        :param eventtype: Event type, e.g. VTA, VTB.
         """
         for event, wo_event in dbquery.reverse_filter_exact(
             self.engine,
             self.table,
             events,
+            start,
+            end,
+            eventtype,
         ):
             if wo_event is None:
                 eventtype_wo = None

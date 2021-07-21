@@ -102,7 +102,8 @@ def main():
 
         if args.reverse:
             if args.print_only:
-                visitor.reverse_print_events(events)
+                visitor.reverse_print_events(
+                    events, starttime, endtime, eventtype=args.eventtype)
         else:
             if args.print_only:
                 visitor.print_events(events)
