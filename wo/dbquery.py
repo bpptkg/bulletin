@@ -25,10 +25,10 @@ def reverse_filter_exact(engine, table, wo_events):
         eventdatemin = df['eventdate'].min()
         eventdatemax = df['eventdate'].max()
 
-        start = eventdatemin.dt.tz_convert(
-            TIMEZONE).dt.tz_localize(None).to_pydatetime()
-        end = eventdatemax.dt.tz_convert(
-            TIMEZONE).dt.tz_localize(None).to_pydatetime()
+        start = eventdatemin.tz_convert(
+            TIMEZONE).tz_localize(None).to_pydatetime()
+        end = eventdatemax.tz_convert(
+            TIMEZONE).tz_localize(None).to_pydatetime()
 
         starttime = start
         # Add more seconds because endtime query is always less than the value.
