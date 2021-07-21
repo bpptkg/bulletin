@@ -1,12 +1,15 @@
 import datetime
+import logging
 
 import pandas as pd
 from webobsclient.contrib.bpptkg.db import query
 
 from .settings import TIMEZONE
 
+logger = logging.getLogger(__name__)
 
-def reverse_filter_exact(engine, table, wo_events):
+
+def reverse_filter_exact(engine, table, wo_events, start, end):
     """
     Generator function to check if particular event not exists (event ID not
     exists, or event ID exists but eventtype differ) in the webobs.
@@ -34,8 +37,14 @@ def reverse_filter_exact(engine, table, wo_events):
         # Add more seconds because endtime query is always less than the value.
         endtime = end + datetime.timedelta(seconds=2)
 
+        logger.info('Database query time range (local): %s to %s',
+                    starttime, endtime)
+
+        logger.info('Fetching bulletin data from database...')
         db_events = query.get_bulletin_all_by_range(
             engine, table, starttime, endtime)
+
+        logger.info('Fetched %s events from database.', len(db_events))
 
         for event in db_events:
             eventid = event['eventid']
