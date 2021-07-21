@@ -74,7 +74,7 @@ def reverse_filter_exact(engine, table, wo_events, start, end, eventtype=None):
                 yield (event, None)
             else:
                 matched_event = df.loc[
-                    df['eventid'] == event['eventid']
+                    df['eventid'] == eventid
                 ].to_dict(orient='records')[0]
                 if matched_event['eventtype'] != event['eventtype']:
                     yield (event, matched_event)
