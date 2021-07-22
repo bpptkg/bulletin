@@ -12,7 +12,14 @@ from ..settings import WEBOBS_HOST, WEBOBS_PASSWORD, WEBOBS_USERNAME
 logger = logging.getLogger(__name__)
 
 
+class FetcherError(Exception):
+    pass
+
+
 class WebObsMC3Fetcher:
+    """
+    WebObs MC3 bulletin fetcher.
+    """
 
     def __init__(self, client=None, parser=None, max_retries=5,
                  retry_delay=10):
@@ -35,7 +42,7 @@ class WebObsMC3Fetcher:
     def request_mc3(self, start, end, eventtype='ALL'):
         """
         Request MC3 bulletin defined by start time, end time, and optional
-        eventtype.
+        eventtype. If request succeed, return CSV string in bytes.
 
         Start time and end time must be a datetime.datetime type and in UTC time
         zone.
@@ -46,7 +53,7 @@ class WebObsMC3Fetcher:
         logger.info('Fetching MC3 bulletin (%s)...', self.client.api.host)
         logger.info('Time range (UTC): %s to %s', start, end)
 
-        for i in range(self.max_retries):
+        for __ in range(self.max_retries):
             try:
                 response, content = self.client.request(
                     starttime=start.strftime(constants.DATETIME_FORMAT),
@@ -63,6 +70,8 @@ class WebObsMC3Fetcher:
                     locstatus=0,
                     mc='MC3',
                 )
+                if response['status'] != '200':
+                    raise FetcherError('The server returned non-200 response')
                 break
             except Exception as e:
                 logger.error(e)
@@ -76,6 +85,13 @@ class WebObsMC3Fetcher:
         """
         Get event from WebObs MC3 bulletin defined by eventdate (UTC) and
         matching criteria (eventid, sc3id, or eventtype).
+
+        The event is resolved with the following precedence: sc3id, eventid, and
+        eventdate. eventdate has to be UTC time-aware datetime.datetime because
+        WebObs MC3 eventdate also in UTC time zone. Beware that eventdate also
+        takes account miliseconds part.
+
+        If event not found after matching criteria, return None.
         """
         start = eventdate - datetime.timedelta(seconds=10)
         end = eventdate + datetime.timedelta(seconds=10)
@@ -116,7 +132,7 @@ class WebObsMC3Fetcher:
         if content is None:
             return pd.DataFrame()
 
-        # Filter exact to allow only eventdate in the particular time range.
+        # Filter exact to allow only eventdate in the defined time range.
         df = self.parser.to_df(content)
         df = df.where((df['eventdate'] >= start) &
                       (df['eventdate'] < end))
