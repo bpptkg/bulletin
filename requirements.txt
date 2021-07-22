@@ -16,5 +16,5 @@ python-memcached>=1.59
 sentry-sdk>=0.19.1
 sphinx_rtd_theme>=0.4.3
 sphinx>=2.0.1
-webobsclient>=1.0.0
+webobsclient>=1.1.0
 bpptkg-richter>=0.4.0
