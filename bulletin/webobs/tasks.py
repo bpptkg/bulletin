@@ -93,12 +93,12 @@ def sync_events(**kwargs):
     Synchronize events between WebObs MC3 and seismic bulletin database and vice
     versa.
     """
-
     fetcher = WebObsMC3Fetcher()
     now = timezone.now()
     start = datetime.datetime(now.year, now.month, now.day, tzinfo=now.tzinfo)
     events = fetcher.fetch_mc3_as_dict(start, now)
     if events:
+        # Sync WebObs MC3 bulletin to seismic bulletin database (forward sync).
         visitor.sync_webobs_and_bulletin(
             schema.engine,
             schema.Bulletin,
@@ -106,6 +106,7 @@ def sync_events(**kwargs):
             **kwargs,
         )
 
+        # Sync seismic bulletin database to WebObs MC3 bulletin (reverse sync).
         visitor.sync_bulletin_and_webobs(
             schema.engine,
             schema.Bulletin,
@@ -121,7 +122,6 @@ def setup_periodic_tasks(sender, **kwargs):
     """
     Register periodic tasks.
     """
-
     sender.add_periodic_task(
         crontab(minute=0),
         sync_events.s(),
