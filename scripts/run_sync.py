@@ -19,7 +19,7 @@ if True:
 
 logger = logging.getLogger(__name__)
 
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 
 
 def parse_args():
@@ -64,6 +64,12 @@ def parse_args():
         help='Reverse sync, i.e. synchronize seismic database '
              'to WebObs MC3 bulletin.')
 
+    parser.add_argument(
+        '-S', '--full-sync',
+        action='store_true',
+        help='Perform full synchronization between WebObs MC3 bulletin '
+             'and seismic bulletin database (forward and reverse syncs).')
+
     return parser.parse_args()
 
 
@@ -100,7 +106,16 @@ def main():
             skip_mag_calc=args.skip_mag_calc,
         )
 
-        if args.reverse:
+        if args.full_sync:
+            logger.info(
+                'Synching WebObs MC3 bulletin and seismic bulletin database...')
+            visitor.process_events(events)
+
+            logger.info(
+                'Synching seismic bulletin database and WebObs MC3 bulletin...')
+            visitor.reverse_process_events(
+                events, starttime, endtime, eventtype=args.eventtype)
+        elif args.reverse:
             if args.print_only:
                 visitor.reverse_print_events(
                     events, starttime, endtime, eventtype=args.eventtype)
