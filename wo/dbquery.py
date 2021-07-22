@@ -12,21 +12,37 @@ logger = logging.getLogger(__name__)
 
 def get_bulletin_by_range(engine, table, starttime, endtime, eventtype):
     """
-    Get bulletin by particular time range and eventtype. If eventtype is None,
-    query all events (excluding None).
+    Get bulletin by particular time range and eventtype.
+
+    :param engine: SQLAlchemy engine.
+
+    :param table: Seismic bulletin model or table.
+
+    :param starttime: Start time of query in local time zone.
+
+    :param endtime: End time of query in local time zone.
+
+    :param eventtype: Event type, e.g. VTA, VTB. If eventtype is None or ALL,
+    query all events (excluding None). ALL eventtype is used by WebObs to query
+    all event types.
     """
+    logger.info('Database eventtype query: %s', eventtype)
+
     with session_scope(engine) as session:
         queryset = session.query(table).filter(
             table.eventdate >= starttime,
             table.eventdate < endtime,
-            table.eventtype != None,
         )
-        if isinstance(eventtype, str):
+        if eventtype == 'ALL':
+            queryset = queryset.filter(table.eventtype != None)
+        elif isinstance(eventtype, str):
             queryset = queryset.filter(table.eventtype == eventtype)
         elif isinstance(eventtype, (list, tuple)):
             queryset = queryset.filter(table.eventtype.in_(eventtype))
         else:
-            queryset = queryset
+            queryset = queryset.filter(table.eventtype != None)
+
+        logger.debug('Queryset: %s', queryset)
 
         results = queryset.order_by(table.eventdate).all()
         return [object_as_dict(item) for item in results]
@@ -49,6 +65,12 @@ def reverse_filter_exact(engine, table, wo_events, start, end, eventtype=None):
     :param end: End time to query database in UTC time zone.
 
     :param eventtype: Event type, e.g. VTA, VTB.
+
+    :return: Yield a tuple of database event and WebObs event (None if not
+    matched), e.g. (event_db, event_wo). event_db is a dictionary of event in
+    the database while event_wo is a dictionary of event in the WebObs. Note
+    that eventdate in the database always uses local time zone while eventdate
+    in the WebObs uses UTC time zone.
     """
 
     df = pd.DataFrame(wo_events)
