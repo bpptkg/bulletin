@@ -3,12 +3,15 @@ import logging
 import pandas as pd
 from webobsclient.contrib.bpptkg.db.sessions import session_scope
 
+from .decorators import retry
 from .settings import TIMEZONE
 
 logger = logging.getLogger(__name__)
 
 
-def hide_event(engine, table, eventid, operator):
+@retry(max_retries=5)
+def hide_event(engine, table, eventid, operator, *,
+               update_operator_value=True):
     """
     Hide an event in the database.
 
@@ -21,19 +24,26 @@ def hide_event(engine, table, eventid, operator):
 
     :param operator: Operator name, e.g. YUL.
 
+    :param update_operator_value: Update operator value. If operator argument is
+    None, the value in the database is None. Otherwise, leave the value as in
+    the database.
+
     :returns: True if hide succeed, otherwise return False.
     """
     with session_scope(engine) as session:
         queryset = session.query(table).get(eventid)
         if queryset is not None:
             queryset.eventtype = None
-            queryset.operator = operator
+            if update_operator_value:
+                queryset.operator = operator
             session.commit()
             return True
         return False
 
 
-def restore_event(engine, table, eventid, eventtype, operator):
+@retry(max_retries=5)
+def restore_event(engine, table, eventid, eventtype, operator,
+                  update_operator_value=True):
     """
     Restore an event in the database.
 
@@ -48,19 +58,26 @@ def restore_event(engine, table, eventid, eventtype, operator):
 
     :param operator: Operator name, e.g. YUL.
 
+    :param update_operator_value: Update operator value. If operator argument is
+    None, the value in the database is None. Otherwise, leave the value as in
+    the database.
+
     :returns: True if restore succeed, otherwise return False.
     """
     with session_scope(engine) as session:
         queryset = session.query(table).get(eventid)
         if queryset is not None:
             queryset.eventtype = eventtype
-            queryset.operator = operator
+            if update_operator_value:
+                queryset.operator = operator
             session.commit()
             return True
         return False
 
 
-def delete_event(engine, table, eventid, operator):
+@retry(max_retries=5)
+def delete_event(engine, table, eventid, operator,
+                 update_operator_value=True):
     """
     For current version, we only implement soft delete instead of actually
     delete an event in the database to prevent accidental deletion.
@@ -76,13 +93,18 @@ def delete_event(engine, table, eventid, operator):
 
     :param operator: Operator name, e.g. YUL.
 
+    :param update_operator_value: Update operator value. If operator argument is
+    None, the value in the database is None. Otherwise, leave the value as in
+    the database.
+
     :returns: True if delete succeed, otherwise return False.
     """
     with session_scope(engine) as session:
         queryset = session.query(table).get(eventid)
         if queryset is not None:
             queryset.eventtype = None
-            queryset.operator = operator
+            if update_operator_value:
+                queryset.operator = operator
             session.commit()
             return True
         return False

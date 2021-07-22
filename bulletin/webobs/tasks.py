@@ -90,8 +90,10 @@ def delete_event(self, eventid, **kwargs):
 @app.task(name='webobs_sync_events')
 def sync_events(**kwargs):
     """
-    Synchronize events between WebObs MC3 and seismic bulletin database.
+    Synchronize events between WebObs MC3 and seismic bulletin database and vice
+    versa.
     """
+
     fetcher = WebObsMC3Fetcher()
     now = timezone.now()
     start = datetime.datetime(now.year, now.month, now.day, tzinfo=now.tzinfo)
@@ -101,6 +103,15 @@ def sync_events(**kwargs):
             schema.engine,
             schema.Bulletin,
             events,
+            **kwargs,
+        )
+
+        visitor.sync_bulletin_and_webobs(
+            schema.engine,
+            schema.Bulletin,
+            events,
+            start,
+            now,
             **kwargs,
         )
 

@@ -3,7 +3,8 @@ import os
 from django.conf import settings
 from obspy import read
 from sqlalchemy import create_engine
-from webobsclient.contrib.bpptkg.db.seismic_bulletin import Base
+# Ignore unused import for Bulletin.
+from webobsclient.contrib.bpptkg.db.seismic_bulletin import Base, Bulletin
 from wo import settings as wo_settings
 from wo.clients.webobs import WebObsMC3Fetcher
 

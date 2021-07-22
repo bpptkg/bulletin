@@ -14,6 +14,46 @@ from .singleton import SingleInstance
 logger = logging.getLogger(__name__)
 
 
+def reverse_process_event_and_updatedb(engine, table, event_db, event_wo, *,
+                                       dry_run=False):
+    """
+    Reverse process event by synchronizing event in the bulletin database to the
+    WebBbs MC3 bulletin. If dry_run is True, don't update the database.
+
+    If event_wo is None, it means that event exists in the database but not in
+    the MC3. So, we need to hide this event.
+
+    If event_wo exists in the database but has different eventtype, restore the
+    event.
+    """
+    eventid = event_db['eventid']
+    operator = event_db['operator']
+
+    if event_wo is None:
+        if dry_run:
+            logger.info('Using dry run. Event is not hidden.')
+        else:
+            ok = ops.hide_event(engine, table, eventid, operator)
+            if ok:
+                logger.info('Event successfully hidden.')
+            else:
+                logger.error('Event failed to be hidden.')
+
+    else:
+        eventtype_wo = event_wo['eventtype']
+        operator_wo = event_wo['operator']
+
+        if dry_run:
+            logger.info('Using dry run. Event is not restored.')
+        else:
+            ok = ops.restore_event(
+                engine, table, eventid, eventtype_wo, operator_wo)
+            if ok:
+                logger.info('Event successfully restored.')
+            else:
+                logger.error('Event failed to be restore.')
+
+
 class SimpleEventVisitor(SingleInstance):
 
     def __init__(self, engine, table, *, lockfile='', flavor_id='',
@@ -93,6 +133,49 @@ class SimpleEventVisitor(SingleInstance):
                 )
             )
 
+    def reverse_process_events(self, events, start, end, eventtype=None):
+        """
+        Process all events in the database that are not in the WebObs MC3
+        bulletin.
+
+        :param events: List of dictionary of WebObs events.
+
+        :param start: Start time to query database in UTC time zone.
+
+        :param end: End time to query database in UTC time zone.
+
+        :param eventtype: Event type, e.g. VTA, VTB.
+        """
+        for event, wo_event in dbquery.reverse_filter_exact(
+            self.engine,
+            self.table,
+            events,
+            start,
+            end,
+            eventtype,
+        ):
+            if wo_event is None:
+                eventtype_wo = None
+            else:
+                eventtype_wo = wo_event['eventtype']
+
+            logger.info(
+                'Found event: %s',
+                '(ID: {}, eventdate[local]: {}, type[db]: {}, '
+                'type[wo]: {})'.format(
+                    event['eventid'],
+                    event['eventdate'],
+                    event['eventtype'],
+                    eventtype_wo,
+                )
+            )
+
+            reverse_process_event_and_updatedb(
+                self.engine,
+                self.table,
+                event,
+                wo_event)
+
     def filter_events(self, events):
         """
         Filter any event that has not been synched between WebObs and database.
@@ -161,10 +244,12 @@ class SimpleEventVisitor(SingleInstance):
                 if stream is not None:
                     logger.info('Stream:')
                     logger.info(stream.__str__(extended=True))
+            else:
+                stream = None
 
-                magnitudes = compute_magnitude_all(stream)
-                logger.info('Magnitude info: %s', magnitudes)
-                event.update(magnitudes)
+            magnitudes = compute_magnitude_all(stream)
+            logger.info('Magnitude info: %s', magnitudes)
+            event.update(magnitudes)
 
             logger.info('Event data: %s', event)
 
@@ -254,6 +339,42 @@ def sync_webobs_and_bulletin(engine, table, events, *, dry_run=False):
         )
 
         process_event_and_updatedb(engine, event_wo, dry_run=dry_run)
+
+
+def sync_bulletin_and_webobs(engine, table, events, start, end, *,
+                             eventtype=None, dry_run=False):
+    """
+    Synchronize events between bulletin database and WebBbs. If any of the event
+    not exists or has different eventtype, process the event and update the
+    database.
+    """
+    for event_db, event_wo in dbquery.reverse_filter_exact(
+        engine,
+        table,
+        events,
+        start,
+        end,
+        eventtype=eventtype,
+    ):
+        if event_wo is None:
+            eventtype_wo = None
+        else:
+            eventtype_wo = event_wo['eventtype']
+
+        logger.info(
+            'Found event: ('
+            'eventid: {}, '
+            'eventdate[local]: {}, '
+            'type[db]: {}, '
+            'type[wo]: {})'.format(
+                event_db['eventid'],
+                event_db['eventdate'],
+                event_db['eventtype'],
+                eventtype_wo)
+        )
+
+        reverse_process_event_and_updatedb(
+            engine, table, event_db, event_wo, dry_run=dry_run)
 
 
 def _execute_action(
