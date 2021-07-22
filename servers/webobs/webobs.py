@@ -34,7 +34,7 @@ def home():
 
 
 def main():
-    bottle.run(host='127.0.0.1', port=6351)
+    bottle.run(host='0.0.0.0', port=6351)
 
 
 if __name__ == '__main__':

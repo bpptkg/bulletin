@@ -1,16 +1,29 @@
 version: "3"
 
 services:
+  db:
+    image: mysql:5.7
+    container_name: bulletin_db
+    volumes:
+      - bulletin_mysql:/var/lib/mysql/
+    restart: always
+    env_file:
+      - ./.env.docker
+
   app:
     build: .
     container_name: bulletin
     restart: always
     env_file:
-      - ./.env
+      - ./.env.docker
     ports:
       - 8000:8000
     volumes:
-      - ./storage/:/app/storage/
+      - ./storage/logs/:/app/storage/logs/
+      - ./storage/media/:/app/storage/media/
+      - ./storage/msd/:/app/storage/msd/
+      - ./storage/run/:/app/storage/run/
+      - ./storage/static/:/app/storage/static/
     command: "gunicorn --workers 4 --bind 0.0.0.0:8000 bulletin.wsgi:application"
 
   nginx:
@@ -33,8 +46,6 @@ services:
     entrypoint:
       - memcached
       - -m 64
-    depends_on:
-      - app
 
   redis:
     image: redis:latest
@@ -45,10 +56,26 @@ services:
     container_name: bulletin_celery
     restart: always
     env_file:
-      - ./.env
+      - ./.env.docker
     volumes:
-      - ./storage/:/app/storage/
-    command: "celery -A bulletin worker --loglevel=INFO"
+      - ./storage/logs/:/app/storage/logs/
+    command: "celery -A bulletin worker -l INFO -f /app/storage/logs/celery.log"
     depends_on:
       - redis
       - app
+
+  celerybeat:
+    build: .
+    container_name: bulletin_celerybeat
+    restart: always
+    env_file:
+      - ./.env.docker
+    volumes:
+      - ./storage/logs/:/app/storage/logs/
+    command: "celery -A bulletin beat -l INFO -f /app/storage/logs/celerybeat.log"
+    depends_on:
+      - redis
+      - app
+
+volumes:
+  bulletin_mysql:

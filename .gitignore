@@ -9,6 +9,7 @@ __pycache__
 docs/_build/
 .coverage
 .env
+.env.docker
 .pytest_cache
 TODO
 btbb.sh
