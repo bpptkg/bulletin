@@ -1,7 +1,6 @@
 import logging
-import os
 
-from obspy import UTCDateTime, read
+from obspy import UTCDateTime
 from obspy.clients.arclink.client import Client as ArcLinkClient
 from obspy.clients.seedlink.basic_client import Client as SeedLinkClient
 
