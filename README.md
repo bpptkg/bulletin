@@ -6,7 +6,7 @@ processing can run in the background and sync the events via scheduler.
 
 ## Documentation
 
-Full documentation for the project is available at docs/ directory.
+Full documentation for the project is available at the docs/ directory.
 
 ## Support
 
