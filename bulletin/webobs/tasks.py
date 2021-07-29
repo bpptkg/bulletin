@@ -92,9 +92,13 @@ def sync_events(**kwargs):
     """
     Synchronize events between WebObs MC3 and seismic bulletin database and vice
     versa.
+
+    Concurrent execution of update event signal and sync events signal may lead
+    to old data replacement. To mitigate this effect, we need to increase the
+    time range of WebObs MC3 fetching.
     """
     fetcher = WebObsMC3Fetcher()
-    now = timezone.now()
+    now = timezone.now() - datetime.timedelta(days=1)
     start = datetime.datetime(now.year, now.month, now.day, tzinfo=now.tzinfo)
     events = fetcher.fetch_mc3_as_dict(start, now)
     if events:
