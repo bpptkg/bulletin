@@ -98,8 +98,12 @@ def sync_events(**kwargs):
     time range of WebObs MC3 fetching.
     """
     fetcher = WebObsMC3Fetcher()
-    now = timezone.now() - datetime.timedelta(days=1)
-    start = datetime.datetime(now.year, now.month, now.day, tzinfo=now.tzinfo)
+    now = timezone.now()
+    start = datetime.datetime(
+        now.year,
+        now.month,
+        now.day,
+        tzinfo=now.tzinfo) - datetime.timedelta(days=1)
     events = fetcher.fetch_mc3_as_dict(start, now)
     if events:
         # Sync WebObs MC3 bulletin to seismic bulletin database (forward sync).
