@@ -102,11 +102,15 @@ class WebObsMC3Fetcher:
             content = self.request_mc3(start, end)
 
         if content is None:
+            logger.info('Fetched content is None')
             return None
 
         df = self.parser.to_df(content)
         if df.empty:
+            logger.info('Fetched events are empty')
             return None
+        else:
+            logger.info('Fetched %s events from WebObs MC3', len(df))
 
         if sc3id is not None:
             event = df.loc[df['seiscompid'] == sc3id]
