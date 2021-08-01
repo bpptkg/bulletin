@@ -8,11 +8,6 @@ processing can run in the background and sync the events via scheduler.
 
 Full documentation for the project is available at the docs/ directory.
 
-## Support
-
-This project is maintained by Indra Rudianto. If you have any question about
-this project, you can contact him at <indrarudianto.official@gmail.com>.
-
 ## License
 
 Copyright (c) 2021-present BPPTKG
