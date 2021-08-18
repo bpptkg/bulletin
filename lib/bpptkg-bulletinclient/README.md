@@ -23,4 +23,4 @@ investigate the problem or send the data again to the bulletin web services.
 
 ## License
 
-[MIT](https://gitlab.com/bpptkg/bulletin/-/blob/main/LICENSE)
+[MIT](https://github.com/bpptkg/bulletin/blob/main/LICENSE)

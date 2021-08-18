@@ -5,9 +5,9 @@ from ..base import Endpoint
 HOME = {
     'name': 'bulletin',
     'description': 'Bulletin Web Services',
-    'url': 'https://gitlab.com/bpptkg/bulletin',
+    'url': 'https://github.com/bpptkg/bulletin',
     'organization': 'BPPTKG',
-    'original_author': 'Indra Rudianto',
+    'author': 'BPPTKG',
     'copyright': 'Copyright (c) 2021-present BPPTKG',
 }
 

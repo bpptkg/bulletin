@@ -6,7 +6,7 @@ processing can run in the background and sync the events via scheduler.
 
 ## Documentation
 
-Full documentation for the project is available at the docs/ directory.
+Full documentation for the project is available at the `docs/` directory.
 
 ## License
 
@@ -14,4 +14,4 @@ Copyright (c) 2021-present BPPTKG
 
 By contributing to the project, you agree that your contributions will be
 licensed under its MIT license. See
-[LICENSE](https://gitlab.com/bpptkg/bulletin/-/blob/main/LICENSE) for details.
+[LICENSE](https://github.com/bpptkg/bulletin/blob/main/LICENSE) for details.

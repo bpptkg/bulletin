@@ -16,7 +16,7 @@ import pytz
 import requests
 
 __version__ = '0.3.0'
-__author__ = 'Indra Rudianto'
+__author__ = 'BPPTKG'
 __license__ = 'MIT'
 __copyright__ = 'Copyright (c) 2021-present BPPTKG'
 

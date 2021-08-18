@@ -18,9 +18,7 @@
 # This file contains modified code from SeisComP scalert. We make some
 # adjustments to send the update signal to our bulletin web services.
 #
-# Modified by: Indra Rudianto
-#
-# Project URL: https://gitlab.com/bpptkg/bulletin
+# Project URL: https://github.com/bpptkg/bulletin
 
 import os
 import sys

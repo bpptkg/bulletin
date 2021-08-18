@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2021-present BPPTKG
 #
-# Project repository: https://gitlab.com/bpptkg/bulletin
+# Project repository: https://github.com/bpptkg/bulletin
 #
 # Send WEBOBS_UPDATE_EVENT to the bulletin web services using
 # bpptkg-bulletinclient library.

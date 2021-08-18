@@ -23,9 +23,9 @@ setup(
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
     license='MIT',
-    author='Indra Rudianto',
-    author_email='indrarudianto.official@gmail.com',
-    url='https://gitlab.com/bpptkg/bulletin',
+    author='BPPTKG',
+    author_email='bpptkg@esdm.go.id',
+    url='https://github.com/bpptkg/bulletin',
     zip_safe=True,
     py_modules=['bulletinclient'],
     entry_points={

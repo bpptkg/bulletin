@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 project = 'Bulletin Web Services'
 copyright = '{}, BPPTKG'.format(datetime.datetime.now().year)
-author = 'Indra Rudianto'
+author = 'BPPTKG'
 release = '0.1.0'
 
 # -- General configuration ---------------------------------------------------

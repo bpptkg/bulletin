@@ -2,7 +2,7 @@ import json
 import os
 
 import bottle
-from bottle import get, request, response
+from bottle import get, response
 
 app = application = bottle.default_app()
 
@@ -29,7 +29,7 @@ def home():
     return json.dumps({
         'name': 'WebObs MC3 mock web services',
         'organization': 'BPPTKG',
-        'original_author': 'Indra Rudianto',
+        'author': 'BPPTKG',
     })
 
 

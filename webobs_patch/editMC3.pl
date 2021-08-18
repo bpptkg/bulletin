@@ -442,7 +442,7 @@ if ($newSC3 > 0) {
 # seismic_bulletin database in sync. The code patch has to be added to the newly
 # installed WebObs, or one when upgrading WebObs version.
 #
-# For more information, see the guide at: https://gitlab.com/bpptkg/bulletin
+# For more information, see the guide at: https://github.com/bpptkg/bulletin
 # ==============================================================================
 my $event_type;
 if ($delete == 0) {

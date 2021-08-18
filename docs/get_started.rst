@@ -16,7 +16,7 @@ Install Memcached for cache server: ::
 
 Clone the project from GitLab repository: ::
 
-    git clone https://gitlab.com/bpptkg/bulletin.git
+    git clone https://github.com/bpptkg/bulletin.git
 
 Change directory to bulletin: ::
 
