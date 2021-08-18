@@ -36,10 +36,10 @@ Create environment variable settings from template: ::
     cp .env.example .env
     vim .env
 
-Edit .env file according to your need. We have included a description in each
-variable setting. So, you know which required variable you have to edit. If you
-are using Docker container, create .env file from .env.docker.example instead of
-.env.example.
+Edit ``.env`` file according to your need. We have included a description in
+each variable setting. So, you know which required variable you have to edit. If
+you are using Docker container, create ``.env`` file from
+``.env.docker.example`` instead of ``.env.example``.
 
 Migrate the database: ::
 

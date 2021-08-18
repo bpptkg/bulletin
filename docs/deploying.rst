@@ -7,7 +7,7 @@ the :doc:`Get Started<./get_started>` section. So in this section, we will
 continue the deployment steps.
 
 After you have installed all package requirements, Redis, Memcached, setting
-.env file, you can do the following.
+``.env`` file, you can do the following.
 
 Install Supervisord: ::
 

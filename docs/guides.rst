@@ -13,7 +13,7 @@ To work with the endpoint, you can install our bpptkg-bulletinclient libary: ::
 
 You can view the source code in the ``lib/bpptkg-bulletinclient/`` directory.
 Default endpoint provided in the libary is
-http://192.168.0.43:9056/api/v1/webobs/.
+``http://192.168.0.43:9056/api/v1/webobs/``.
 
 If a request failed to send to the server, bulletinclient will store the failed
 request data in the ``~/.bulletin/failedrequest/`` directory.
@@ -24,7 +24,7 @@ Currently, supported actions are as follows:
 
 Send WEBOBS_UPDATE_EVENT signal to our web services to update an event in the
 seismic bulletin database and do necessary fields calculation, e.g. magnitude,
-energy, etc. The calculation is done in the background. So it won't block the
+energy, etc. The calculation is done in the background. So, it won't block the
 request.
 
 Example command: ::
@@ -33,10 +33,11 @@ Example command: ::
 
 Note that all date time in the request use UTC time zone.
 
-For this action, required payload is ``--eventdate``. The web server will fetch
-the event using this meta data from WebObs MC3 bulletin. You can also pass
-``--sc3id``, ``--eventid``, ``--eventtype``, and ``--operator`` options. These
-meta data will help the web services find the right event to update.
+For this action, required payload is ``--eventdate`` (include miliseconds part
+if any). The web server will fetch the event using this meta data from WebObs
+MC3 bulletin. You can also pass ``--sc3id``, ``--eventid``, ``--eventtype``, and
+``--operator`` options. These meta data will help the web services find the
+right event to update.
 
 If one observer update an event, it has eventid already created, e.g.
 ``2021-07#3455``. But for picking a new event, eventid may still generated.
