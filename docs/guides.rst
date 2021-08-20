@@ -49,8 +49,8 @@ right event.
 You can use ``webobs_patch/update_trigger`` script to integrate the script in
 the WebObs server.
 
-See `webobs_patch/README.md` on how to modify WebObs MC3 so we can integrate the
-script to send update signal.
+See ``webobs_patch/README.md`` on how to modify WebObs MC3 so we can integrate
+the script to send update signal.
 
 - **WEBOBS_HIDE_EVENT**
 
