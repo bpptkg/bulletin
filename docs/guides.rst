@@ -5,7 +5,7 @@ Guides
 For current version, we provide the following endpoint to send update signal to
 the Bulletin web services: ::
 
-    GET /api/v1/webobs/
+    POST /api/v1/webobs/
 
 To work with the endpoint, you can install our bpptkg-bulletinclient libary: ::
 
@@ -48,6 +48,9 @@ right event.
 
 You can use ``webobs_patch/update_trigger`` script to integrate the script in
 the WebObs server.
+
+See `webobs_patch/README.md` on how to modify WebObs MC3 so we can integrate the
+script to send update signal.
 
 - **WEBOBS_HIDE_EVENT**
 

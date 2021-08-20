@@ -1,6 +1,6 @@
 # Bulletin Web Services
 
-This project aim to make WebObs MC3 bulletin, SeisComP, and BPPTKG seismic
+This project aims to make WebObs MC3 bulletin, SeisComP, and BPPTKG seismic
 bulletin database in sync. We make the web services to enable concurrent heavy
 processing can run in the background and sync the events via scheduler.
 
