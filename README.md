@@ -13,5 +13,5 @@ Full documentation for the project is available at the `docs/` directory.
 Copyright (c) 2021-present BPPTKG
 
 By contributing to the project, you agree that your contributions will be
-licensed under its GNU General Public License. See
+licensed under its GNU GPLv3. See
 [LICENSE](https://github.com/bpptkg/bulletin/blob/main/LICENSE) for details.
