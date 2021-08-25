@@ -10,18 +10,24 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import re
+import io
 import os
 import sys
 import datetime
 sys.path.insert(0, os.path.abspath('..'))
 
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+with io.open(os.path.join(base_dir, 'bulletin', '__init__.py'), 'rt', encoding='utf-8') as f:
+    version = re.search(r"__version__ = '(.*?)'", f.read()).group(1)
 
 # -- Project information -----------------------------------------------------
 
 project = 'Bulletin Web Services'
 copyright = '{}, BPPTKG'.format(datetime.datetime.now().year)
 author = 'BPPTKG'
-release = '0.1.0'
+release = version
 
 # -- General configuration ---------------------------------------------------
 
