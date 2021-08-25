@@ -6,6 +6,8 @@ Install OS package requirements: ::
 
     sudo apt install python3-dev libmysqlclient-dev python3-virtualenv
 
+For current version, only MySQL database is supported.
+
 Install Redis server for Celery broker: ::
 
     sudo apt install redis-server
@@ -49,10 +51,10 @@ Run development server: ::
 
     python manage.py runserver
 
-Run Celery worker: ::
+Open a new terminal and run the Celery worker: ::
 
     celery -A bulletin worker -l INFO
 
-Run Celery beat scheduler: ::
+Open a new terminal and run the Celery beat scheduler: ::
 
     celery -A bulletin beat -l INFO
