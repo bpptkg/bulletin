@@ -200,12 +200,21 @@ def parse_args():
         '--eventid',
         help='Event ID (eventid), e.g. 2021-07#3330. '
              'For WEBOBS_HIDE_EVENT, WEBOBS_RESTORE_EVENT, '
-             'and WEBOBS_DELETE_EVENT, eventid is required.')
+             'and WEBOBS_DELETE_EVENT, eventid is required. '
+             'Do not forget to wrap the value in quote because eventid '
+             'has hash (#) character that may treated as a comment '
+             'in the bash argument.')
 
     parser.add_argument(
         '--eventdate',
-        help="Event date in UTC time zone. "
-             "For WEBOBS_UPDATE_EVENT, eventdate value is required.")
+        help="Event date in UTC time zone, e.g. 2022-01-12 04:48:49.04. "
+             "For WEBOBS_UPDATE_EVENT, eventdate value is required. "
+             "Do not forget to also include miliseconds part of the "
+             "event date because bulletin web services will match "
+             "the exact date time value. You can also specify the value "
+             "in ISO date format or any standard format that readable "
+             "by bulletin web services. Do not forget to wrap the value "
+             "in quote if your date time contains a space.")
 
     parser.add_argument(
         '--sc3id',
