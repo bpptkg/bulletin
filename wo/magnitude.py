@@ -6,7 +6,7 @@ def get_station_info():
         {
             'network': 'VG',
             'station': 'MEDEL',
-            'channel': 'EHZ',
+            'channel': 'HHZ',
             'component': 'Z',
             'ml_field': 'ml_deles',
             'app_field': 'count_deles',
