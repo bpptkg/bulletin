@@ -1,4 +1,4 @@
-django==3.2.13
+django==3.2.14
 django-cors-headers>=3.0.1
 djangorestframework>=3.9.0
 gunicorn>=19.9.0
