@@ -8,6 +8,11 @@ processing can run in the background and sync the events via scheduler.
 
 Full documentation for the project is available at the `docs/` directory.
 
+## Notes
+
+This project still uses `ArclinkClient` which only available using ObsPy version
+1.2.x.
+
 ## License
 
 Copyright (c) 2021-present BPPTKG
