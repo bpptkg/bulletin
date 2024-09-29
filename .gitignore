@@ -17,3 +17,5 @@ dist/
 *.egg-info
 db.sqlite3
 celerybeat-schedule
+waveview.json
+waveview-token.json
