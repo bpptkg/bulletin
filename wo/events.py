@@ -8,24 +8,25 @@ class BulletinEvent(enum.Enum):
     Reference:
     https://bma.cendana15.com/docs/apis/monitoring/bulletin.html#event-code-reference
     """
-    ANTHROP = 'ANTHROP'
-    AUTO = 'AUTO'
-    AWANPANAS = 'AWANPANAS'
-    EXPLOSION = 'EXPLOSION'
-    GASBURST = 'GASBURST'
-    LAHAR = 'LAHAR'
-    LF = 'LF'
-    MP = 'MP'
-    ROCKFALL = 'ROCKFALL'
-    SOUND = 'SOUND'
-    TECLOC = 'TECLOC'
-    TECT = 'TECT'
-    TELE = 'TELE'
-    TPHASE = 'TPHASE'
-    TREMOR = 'TREMOR'
-    UNKNOWN = 'UNKNOWN'
-    VTA = 'VTA'
-    VTB = 'VTB'
+
+    ANTHROP = "ANTHROP"
+    AUTO = "AUTO"
+    AWANPANAS = "AWANPANAS"
+    EXPLOSION = "EXPLOSION"
+    GASBURST = "GASBURST"
+    LAHAR = "LAHAR"
+    LF = "LF"
+    MP = "MP"
+    ROCKFALL = "ROCKFALL"
+    SOUND = "SOUND"
+    TECLOC = "TECLOC"
+    TECT = "TECT"
+    TELE = "TELE"
+    TPHASE = "TPHASE"
+    TREMOR = "TREMOR"
+    UNKNOWN = "UNKNOWN"
+    VTA = "VTA"
+    VTB = "VTB"
 
     ALL = [
         ANTHROP,

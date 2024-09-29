@@ -8,7 +8,7 @@ from ..settings import TIMEZONE
 
 def localize(d, timezone=TIMEZONE):
     if d.tzinfo is not None:
-        raise ValueError('Date value is already has timezone info set.')
+        raise ValueError("Date value is already has timezone info set.")
     return pytz.timezone(timezone).localize(d)
 
 

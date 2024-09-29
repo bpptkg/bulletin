@@ -10,8 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 @retry(max_retries=5)
-def hide_event(engine, table, eventid, operator, *,
-               update_operator_value=True):
+def hide_event(engine, table, eventid, operator, *, update_operator_value=True):
     """
     Hide an event in the database.
 
@@ -42,8 +41,9 @@ def hide_event(engine, table, eventid, operator, *,
 
 
 @retry(max_retries=5)
-def restore_event(engine, table, eventid, eventtype, operator,
-                  update_operator_value=True):
+def restore_event(
+    engine, table, eventid, eventtype, operator, update_operator_value=True
+):
     """
     Restore an event in the database.
 
@@ -76,8 +76,7 @@ def restore_event(engine, table, eventid, eventtype, operator,
 
 
 @retry(max_retries=5)
-def delete_event(engine, table, eventid, operator,
-                 update_operator_value=True):
+def delete_event(engine, table, eventid, operator, update_operator_value=True):
     """
     For current version, we only implement soft delete instead of actually
     delete an event in the database to prevent accidental deletion.
@@ -185,54 +184,56 @@ def mysql_upsert(engine, data):
 	        loctype=VALUES(loctype)
     """
     column_names = [
-        'eventid',
-        'eventdate',
-        'eventdate_microsecond',
-        'number',
-        'duration',
-        'amplitude',
-        'magnitude',
-        'longitude',
-        'latitude',
-        'depth',
-        'eventtype',
-        'seiscompid',
-        'valid',
-        'projection',
-        'operator',
-        'timestamp',
-        'timestamp_microsecond',
-        'count_deles',
-        'count_labuhan',
-        'count_pasarbubar',
-        'count_pusunglondon',
-        'ml_deles',
-        'ml_labuhan',
-        'ml_pasarbubar',
-        'ml_pusunglondon',
-        'location_mode',
-        'location_type',
+        "eventid",
+        "eventdate",
+        "eventdate_microsecond",
+        "number",
+        "duration",
+        "amplitude",
+        "magnitude",
+        "longitude",
+        "latitude",
+        "depth",
+        "eventtype",
+        "seiscompid",
+        "valid",
+        "projection",
+        "operator",
+        "timestamp",
+        "timestamp_microsecond",
+        "count_deles",
+        "count_labuhan",
+        "count_pasarbubar",
+        "count_pusunglondon",
+        "ml_deles",
+        "ml_labuhan",
+        "ml_pasarbubar",
+        "ml_pusunglondon",
+        "location_mode",
+        "location_type",
     ]
 
-    logger.info('Preparing event data entry.')
+    logger.info("Preparing event data entry.")
     if isinstance(data, dict):
-        df = pd.DataFrame([data, ])
+        df = pd.DataFrame(
+            [
+                data,
+            ]
+        )
     else:
         df = pd.DataFrame(data)
 
     # Convert any timestamp column to local time zone.
-    df['eventdate'] = df['eventdate'].dt.tz_convert(
-        TIMEZONE).dt.tz_localize(None)
-    df['timestamp'] = df['timestamp'].dt.tz_convert(
-        TIMEZONE).dt.tz_localize(None)
+    df["eventdate"] = df["eventdate"].dt.tz_convert(TIMEZONE).dt.tz_localize(None)
+    df["timestamp"] = df["timestamp"].dt.tz_convert(TIMEZONE).dt.tz_localize(None)
 
-    datetime_format = '%Y-%m-%d %H:%M:%S'
-    df['eventdate'] = df['eventdate'].dt.strftime(datetime_format)
-    df['timestamp'] = df['timestamp'].dt.strftime(datetime_format)
+    datetime_format = "%Y-%m-%d %H:%M:%S"
+    df["eventdate"] = df["eventdate"].dt.strftime(datetime_format)
+    df["timestamp"] = df["timestamp"].dt.strftime(datetime_format)
 
     df = df.astype(object).where((pd.notnull(df)), None)
 
-    logger.info('Event entries: %s', df.to_dict(orient='records'))
+    logger.info("Event entries: %s", df.to_dict(orient="records"))
 
     entries = map(tuple, df[column_names].values.tolist())
     connection = engine.raw_connection()
