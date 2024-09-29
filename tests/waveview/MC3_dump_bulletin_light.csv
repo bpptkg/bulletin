@@ -1,0 +1,5 @@
+#WEBOBS-BPPTKG: Merapi Seismic Catalog
+#YYYYmmdd HHMMSS.ss;Nb(#);Duration;Amplitude;Magnitude;E(J);Longitude;Latitude;Depth;Type;File;LocMode;LocType;Projection;Operator;Timestamp;ID
+20210708 000200.24;1;45.4;15mm;;;;;;ROCKFALL;://bpptkg2021nhcpfx;;;WGS84;HSW;20210708T000920;2021-07#2380
+20210708 000419.00;1;10;7mm;;;;;;ROCKFALL;://bpptkg2021nhcrfb;;;WGS84;HSW;20210708T000940;2021-07#2381
+20210708 000943.60;1;11.32;3mm;;;;;;ROCKFALL;;;;WGS84;HSW;20210708T021924;2021-07#2392
