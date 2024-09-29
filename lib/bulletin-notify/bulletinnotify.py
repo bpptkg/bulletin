@@ -37,8 +37,7 @@ class ObjectAlert(seiscomp.client.Application):
         self.setDatabaseEnabled(True, True)
         self.setLoadRegionsEnabled(True)
         self.setMessagingUsername("")
-        self.setPrimaryMessagingGroup(
-            seiscomp.client.Protocol.LISTENER_GROUP)
+        self.setPrimaryMessagingGroup(seiscomp.client.Protocol.LISTENER_GROUP)
         self.addMessagingSubscription("EVENT")
         self.addMessagingSubscription("LOCATION")
         self.addMessagingSubscription("MAGNITUDE")
@@ -70,24 +69,46 @@ class ObjectAlert(seiscomp.client.Application):
         self._phaseHints = []
 
     def createCommandLineDescription(self):
-        self.commandline().addOption("Generic", "first-new",
-                                     "calls an event a new event when it is seen the first time")
+        self.commandline().addOption(
+            "Generic",
+            "first-new",
+            "calls an event a new event when it is seen the first time",
+        )
         self.commandline().addGroup("Alert")
-        self.commandline().addStringOption("Alert", "amp-type",
-                                           "amplitude type to listen to", self._ampType)
-        self.commandline().addStringOption("Alert", "pick-script",
-                                           "script to be called when a pick arrived, network-, station code pick publicID are passed as parameters $1, $2, $3 and $4")
-        self.commandline().addStringOption("Alert", "amp-script",
-                                           "script to be called when a station amplitude arrived, network-, station code, amplitude and amplitude publicID are passed as parameters $1, $2, $3 and $4")
-        self.commandline().addStringOption("Alert", "alert-script",
-                                           "script to be called when a preliminary origin arrived, latitude and longitude are passed as parameters $1 and $2")
-        self.commandline().addStringOption("Alert", "event-script",
-                                           "script to be called when an event has been declared; the message string, a flag (1=new event, 0=update event), the EventID, the arrival count and the magnitude (optional when set) are passed as parameter $1, $2, $3, $4 and $5")
+        self.commandline().addStringOption(
+            "Alert", "amp-type", "amplitude type to listen to", self._ampType
+        )
+        self.commandline().addStringOption(
+            "Alert",
+            "pick-script",
+            "script to be called when a pick arrived, network-, station code pick publicID are passed as parameters $1, $2, $3 and $4",
+        )
+        self.commandline().addStringOption(
+            "Alert",
+            "amp-script",
+            "script to be called when a station amplitude arrived, network-, station code, amplitude and amplitude publicID are passed as parameters $1, $2, $3 and $4",
+        )
+        self.commandline().addStringOption(
+            "Alert",
+            "alert-script",
+            "script to be called when a preliminary origin arrived, latitude and longitude are passed as parameters $1 and $2",
+        )
+        self.commandline().addStringOption(
+            "Alert",
+            "event-script",
+            "script to be called when an event has been declared; the message string, a flag (1=new event, 0=update event), the EventID, the arrival count and the magnitude (optional when set) are passed as parameter $1, $2, $3, $4 and $5",
+        )
         self.commandline().addGroup("Cities")
-        self.commandline().addStringOption("Cities", "max-dist",
-                                           "maximum distance for using the distance from a city to the earthquake")
-        self.commandline().addStringOption("Cities", "min-population",
-                                           "minimum population for a city to become a point of interest")
+        self.commandline().addStringOption(
+            "Cities",
+            "max-dist",
+            "maximum distance for using the distance from a city to the earthquake",
+        )
+        self.commandline().addStringOption(
+            "Cities",
+            "min-population",
+            "minimum population for a city to become a point of interest",
+        )
         self.commandline().addGroup("Debug")
         self.commandline().addStringOption("Debug", "eventid,E", "specify Event ID")
         return True
@@ -118,8 +139,7 @@ class ObjectAlert(seiscomp.client.Application):
         except:
             pass
 
-
-        self._phaseHints = ['P','S']
+        self._phaseHints = ["P", "S"]
         try:
             phaseHints = self.configGetStrings("constraints.phaseHints")
             self._phaseHints = []
@@ -176,7 +196,9 @@ class ObjectAlert(seiscomp.client.Application):
                 seiscomp.logging.warning("No pick script defined")
 
         if self._pickScript:
-            self._pickScript = seiscomp.system.Environment.Instance().absolutePath(self._pickScript)
+            self._pickScript = seiscomp.system.Environment.Instance().absolutePath(
+                self._pickScript
+            )
             seiscomp.logging.info("Using pick script %s" % self._pickScript)
 
             if not os.path.isfile(self._pickScript):
@@ -198,7 +220,9 @@ class ObjectAlert(seiscomp.client.Application):
                 seiscomp.logging.warning("No amplitude script defined")
 
         if self._ampScript:
-            self._ampScript = seiscomp.system.Environment.Instance().absolutePath(self._ampScript)
+            self._ampScript = seiscomp.system.Environment.Instance().absolutePath(
+                self._ampScript
+            )
             seiscomp.logging.info("Using amplitude script %s" % self._ampScript)
 
             if not os.path.isfile(self._ampScript):
@@ -220,8 +244,9 @@ class ObjectAlert(seiscomp.client.Application):
                 seiscomp.logging.warning("No alert script defined")
 
         if self._alertScript:
-            self._alertScript = seiscomp.system.Environment.Instance(
-            ).absolutePath(self._alertScript)
+            self._alertScript = seiscomp.system.Environment.Instance().absolutePath(
+                self._alertScript
+            )
             seiscomp.logging.info("Using alert script %s" % self._alertScript)
 
             if not os.path.isfile(self._alertScript):
@@ -243,8 +268,9 @@ class ObjectAlert(seiscomp.client.Application):
                 seiscomp.logging.warning("No event script defined")
 
         if self._eventScript:
-            self._eventScript = seiscomp.system.Environment.Instance(
-            ).absolutePath(self._eventScript)
+            self._eventScript = seiscomp.system.Environment.Instance().absolutePath(
+                self._eventScript
+            )
             seiscomp.logging.info("Using event script %s" % self._eventScript)
 
             if not os.path.isfile(self._eventScript):
@@ -263,33 +289,39 @@ class ObjectAlert(seiscomp.client.Application):
 
         seiscomp.logging.info("Creating ringbuffer for 100 objects")
         if not self.query():
-            seiscomp.logging.warning(
-                "No valid database interface to read from")
-        self._cache = seiscomp.datamodel.PublicObjectRingBuffer(
-            self.query(), 100)
+            seiscomp.logging.warning("No valid database interface to read from")
+        self._cache = seiscomp.datamodel.PublicObjectRingBuffer(self.query(), 100)
 
         if self._ampScript and self.connection():
             seiscomp.logging.info(
-                "Amplitude script defined: subscribing to AMPLITUDE message group")
+                "Amplitude script defined: subscribing to AMPLITUDE message group"
+            )
             self.connection().subscribe("AMPLITUDE")
 
         if self._pickScript and self.connection():
             seiscomp.logging.info(
-                "Pick script defined: subscribing to PICK message group")
+                "Pick script defined: subscribing to PICK message group"
+            )
             self.connection().subscribe("PICK")
 
         if self._newWhenFirstSeen:
             seiscomp.logging.info(
-                "A new event is declared when I see it the first time")
+                "A new event is declared when I see it the first time"
+            )
 
         seiscomp.logging.info("Filtering:")
         if " ".join(self._agencyIDs):
-            seiscomp.logging.info(" + agencyIDs filter for events and picks: %s" % (" ".join(self._agencyIDs)))
+            seiscomp.logging.info(
+                " + agencyIDs filter for events and picks: %s"
+                % (" ".join(self._agencyIDs))
+            )
         else:
             seiscomp.logging.info(" + agencyIDs: no filter is applied")
 
         if " ".join(self._phaseHints):
-            seiscomp.logging.info(" + phase hint filter for picks: '%s'" % (" ".join(self._phaseHints)))
+            seiscomp.logging.info(
+                " + phase hint filter for picks: '%s'" % (" ".join(self._phaseHints))
+            )
         else:
             seiscomp.logging.info(" + phase hints: no filter is applied")
 
@@ -312,7 +344,6 @@ class ObjectAlert(seiscomp.client.Application):
                 sys.stderr.write(i)
             return False
 
-
     def runPickScript(self, pickObject):
         if not self._pickScript:
             return
@@ -328,25 +359,29 @@ class ObjectAlert(seiscomp.client.Application):
             sta = "unknown"
         pickID = pickObject.publicID()
         try:
-            phaseHint =  pickObject.phaseHint().code()
+            phaseHint = pickObject.phaseHint().code()
         except:
             phaseHint = "unknown"
-            
+
         print(net, sta, pickID, phaseHint)
 
         if self._pickProc is not None:
             if self._pickProc.poll() is None:
                 seiscomp.logging.warning(
-                    "Pick script still in progress -> skipping message")
+                    "Pick script still in progress -> skipping message"
+                )
                 return
         try:
             self._pickProc = subprocess.Popen(
-                [self._pickScript, net, sta, pickID, phaseHint])
+                [self._pickScript, net, sta, pickID, phaseHint]
+            )
             seiscomp.logging.info(
-                "Started pick script with pid %d" % self._pickProc.pid)
+                "Started pick script with pid %d" % self._pickProc.pid
+            )
         except:
             seiscomp.logging.error(
-                "Failed to start pick script '%s'" % self._pickScript)
+                "Failed to start pick script '%s'" % self._pickScript
+            )
 
     def runAmpScript(self, ampObject):
         if not self._ampScript:
@@ -361,16 +396,20 @@ class ObjectAlert(seiscomp.client.Application):
         if self._ampProc is not None:
             if self._ampProc.poll() is None:
                 seiscomp.logging.warning(
-                    "Amplitude script still in progress -> skipping message")
+                    "Amplitude script still in progress -> skipping message"
+                )
                 return
         try:
             self._ampProc = subprocess.Popen(
-                [self._ampScript, net, sta, "%.2f" % amp, ampID])
+                [self._ampScript, net, sta, "%.2f" % amp, ampID]
+            )
             seiscomp.logging.info(
-                "Started amplitude script with pid %d" % self._ampProc.pid)
+                "Started amplitude script with pid %d" % self._ampProc.pid
+            )
         except:
             seiscomp.logging.error(
-                "Failed to start amplitude script '%s'" % self._ampScript)
+                "Failed to start amplitude script '%s'" % self._ampScript
+            )
 
     def runAlert(self, lat, lon):
         if not self._alertScript:
@@ -379,16 +418,20 @@ class ObjectAlert(seiscomp.client.Application):
         if self._alertProc is not None:
             if self._alertProc.poll() is None:
                 seiscomp.logging.warning(
-                    "AlertScript still in progress -> skipping message")
+                    "AlertScript still in progress -> skipping message"
+                )
                 return
         try:
             self._alertProc = subprocess.Popen(
-                [self._alertScript, "%.1f" % lat, "%.1f" % lon])
+                [self._alertScript, "%.1f" % lat, "%.1f" % lon]
+            )
             seiscomp.logging.info(
-                "Started alert script with pid %d" % self._alertProc.pid)
+                "Started alert script with pid %d" % self._alertProc.pid
+            )
         except:
             seiscomp.logging.error(
-                "Failed to start alert script '%s'" % self._alertScript)
+                "Failed to start alert script '%s'" % self._alertScript
+            )
 
     def handleMessage(self, msg):
         try:
@@ -399,12 +442,13 @@ class ObjectAlert(seiscomp.client.Application):
                     if org:
                         try:
                             if org.evaluationStatus() == seiscomp.datamodel.PRELIMINARY:
-                                self.runAlert(org.latitude().value(),
-                                              org.longitude().value())
+                                self.runAlert(
+                                    org.latitude().value(), org.longitude().value()
+                                )
                         except:
                             pass
 
-            #ao = seiscomp.datamodel.ArtificialOriginMessage.Cast(msg)
+            # ao = seiscomp.datamodel.ArtificialOriginMessage.Cast(msg)
             # if ao:
             #  org = ao.origin()
             #  if org:
@@ -430,16 +474,23 @@ class ObjectAlert(seiscomp.client.Application):
                     if not self._phaseHints or phaseHint in self._phaseHints:
                         self.notifyPick(obj)
                     else:
-                        seiscomp.logging.debug(" + phase hint %s does not match '%s'" % (phaseHint, self._phaseHints))
+                        seiscomp.logging.debug(
+                            " + phase hint %s does not match '%s'"
+                            % (phaseHint, self._phaseHints)
+                        )
                 else:
-                    seiscomp.logging.debug(" + agencyID %s does not match '%s'" % (agencyID, self._agencyIDs))
+                    seiscomp.logging.debug(
+                        " + agencyID %s does not match '%s'"
+                        % (agencyID, self._agencyIDs)
+                    )
 
             # amplitude
             obj = seiscomp.datamodel.Amplitude.Cast(object)
             if obj:
                 if obj.type() == self._ampType:
-                    seiscomp.logging.debug("got new %s amplitude '%s'" % (
-                        self._ampType, obj.publicID()))
+                    seiscomp.logging.debug(
+                        "got new %s amplitude '%s'" % (self._ampType, obj.publicID())
+                    )
                     self.notifyAmplitude(obj)
 
             # origin
@@ -450,8 +501,7 @@ class ObjectAlert(seiscomp.client.Application):
 
                 try:
                     if obj.evaluationStatus() == seiscomp.datamodel.PRELIMINARY:
-                        self.runAlert(obj.latitude().value(),
-                                      obj.longitude().value())
+                        self.runAlert(obj.latitude().value(), obj.longitude().value())
                 except:
                     pass
 
@@ -461,15 +511,15 @@ class ObjectAlert(seiscomp.client.Application):
             obj = seiscomp.datamodel.Magnitude.Cast(object)
             if obj:
                 self._cache.feed(obj)
-                seiscomp.logging.debug(
-                    "got new magnitude '%s'" % obj.publicID())
+                seiscomp.logging.debug("got new magnitude '%s'" % obj.publicID())
                 return
 
             # event
             obj = seiscomp.datamodel.Event.Cast(object)
             if obj:
                 org = self._cache.get(
-                    seiscomp.datamodel.Origin, obj.preferredOriginID())
+                    seiscomp.datamodel.Origin, obj.preferredOriginID()
+                )
                 agencyID = org.creationInfo().agencyID()
                 seiscomp.logging.debug("got new event '%s'" % obj.publicID())
                 if not self._agencyIDs or agencyID in self._agencyIDs:
@@ -484,7 +534,8 @@ class ObjectAlert(seiscomp.client.Application):
             obj = seiscomp.datamodel.Event.Cast(object)
             if obj:
                 org = self._cache.get(
-                    seiscomp.datamodel.Origin, obj.preferredOriginID())
+                    seiscomp.datamodel.Origin, obj.preferredOriginID()
+                )
                 agencyID = org.creationInfo().agencyID()
                 seiscomp.logging.debug("update event '%s'" % obj.publicID())
                 if not self._agencyIDs or agencyID in self._agencyIDs:
@@ -502,11 +553,12 @@ class ObjectAlert(seiscomp.client.Application):
 
     def notifyEvent(self, evt, newEvent=True, dtmax=3600):
         try:
-            org = self._cache.get(
-                seiscomp.datamodel.Origin, evt.preferredOriginID())
+            org = self._cache.get(seiscomp.datamodel.Origin, evt.preferredOriginID())
             if not org:
                 seiscomp.logging.warning(
-                    "unable to get origin %s, ignoring event message" % evt.preferredOriginID())
+                    "unable to get origin %s, ignoring event message"
+                    % evt.preferredOriginID()
+                )
                 return
 
             preliminary = False
@@ -518,17 +570,21 @@ class ObjectAlert(seiscomp.client.Application):
 
             if preliminary == False:
                 nmag = self._cache.get(
-                    seiscomp.datamodel.Magnitude, evt.preferredMagnitudeID())
+                    seiscomp.datamodel.Magnitude, evt.preferredMagnitudeID()
+                )
                 if nmag:
                     mag = nmag.magnitude().value()
                     mag = "magnitude %.1f" % mag
                 else:
                     if len(evt.preferredMagnitudeID()) > 0:
                         seiscomp.logging.warning(
-                            "unable to get magnitude %s, ignoring event message" % evt.preferredMagnitudeID())
+                            "unable to get magnitude %s, ignoring event message"
+                            % evt.preferredMagnitudeID()
+                        )
                     else:
                         seiscomp.logging.warning(
-                            "no preferred magnitude yet, ignoring event message")
+                            "no preferred magnitude yet, ignoring event message"
+                        )
                     return
 
             # keep track of old events
@@ -540,19 +596,28 @@ class ObjectAlert(seiscomp.client.Application):
                 self._oldEvents.append(evt.publicID())
 
             dsc = seiscomp.seismology.Regions.getRegionName(
-                org.latitude().value(), org.longitude().value())
+                org.latitude().value(), org.longitude().value()
+            )
 
             if self._eventDescriptionPattern:
                 try:
-                    city, dist, azi = self.nearestCity(org.latitude().value(), org.longitude(
-                    ).value(), self._citiesMaxDist, self._citiesMinPopulation)
+                    city, dist, azi = self.nearestCity(
+                        org.latitude().value(),
+                        org.longitude().value(),
+                        self._citiesMaxDist,
+                        self._citiesMinPopulation,
+                    )
                     if city:
                         dsc = self._eventDescriptionPattern
                         region = seiscomp.seismology.Regions.getRegionName(
-                            org.latitude().value(), org.longitude().value())
+                            org.latitude().value(), org.longitude().value()
+                        )
                         distStr = str(int(seiscomp.math.deg2km(dist)))
-                        dsc = dsc.replace("@region@", region).replace(
-                            "@dist@", distStr).replace("@poi@", city.name())
+                        dsc = (
+                            dsc.replace("@region@", region)
+                            .replace("@dist@", distStr)
+                            .replace("@poi@", city.name())
+                        )
                 except:
                     pass
 
@@ -564,13 +629,13 @@ class ObjectAlert(seiscomp.client.Application):
 
             dt = (now - otm).seconds()
 
-    #   if dt > dtmax:
-    #       return
+            #   if dt > dtmax:
+            #       return
 
             if dt > 3600:
-                dt = "%d hours %d minutes ago" % (dt/3600, (dt % 3600)/60)
+                dt = "%d hours %d minutes ago" % (dt / 3600, (dt % 3600) / 60)
             elif dt > 120:
-                dt = "%d minutes ago" % (dt/60)
+                dt = "%d minutes ago" % (dt / 60)
             else:
                 dt = "%d seconds ago" % dt
 
@@ -578,7 +643,11 @@ class ObjectAlert(seiscomp.client.Application):
                 message = "earthquake, XXL, preliminary, %s, %s" % (dt, dsc)
             else:
                 message = "earthquake, %s, %s, %s, depth %d kilometers" % (
-                    dt, dsc, mag, int(dep+0.5))
+                    dt,
+                    dsc,
+                    mag,
+                    int(dep + 0.5),
+                )
             seiscomp.logging.info(message)
 
             if not self._eventScript:
@@ -587,7 +656,8 @@ class ObjectAlert(seiscomp.client.Application):
             if self._eventProc is not None:
                 if self._eventProc.poll() is None:
                     seiscomp.logging.warning(
-                        "EventScript still in progress -> skipping message")
+                        "EventScript still in progress -> skipping message"
+                    )
                     return
 
             try:
@@ -598,7 +668,8 @@ class ObjectAlert(seiscomp.client.Application):
                     param2 = 1
 
                 org = self._cache.get(
-                    seiscomp.datamodel.Origin, evt.preferredOriginID())
+                    seiscomp.datamodel.Origin, evt.preferredOriginID()
+                )
                 if org:
                     try:
                         param3 = org.quality().associatedPhaseCount()
@@ -606,17 +677,29 @@ class ObjectAlert(seiscomp.client.Application):
                         pass
 
                 nmag = self._cache.get(
-                    seiscomp.datamodel.Magnitude, evt.preferredMagnitudeID())
+                    seiscomp.datamodel.Magnitude, evt.preferredMagnitudeID()
+                )
                 if nmag:
                     param4 = "%.1f" % nmag.magnitude().value()
 
                 self._eventProc = subprocess.Popen(
-                    [self._eventScript, message, "%d" % param2, evt.publicID(), "%d" % param3, param4])
+                    [
+                        self._eventScript,
+                        message,
+                        "%d" % param2,
+                        evt.publicID(),
+                        "%d" % param3,
+                        param4,
+                    ]
+                )
                 seiscomp.logging.info(
-                    "Started event script with pid %d" % self._eventProc.pid)
+                    "Started event script with pid %d" % self._eventProc.pid
+                )
             except:
-                seiscomp.logging.error("Failed to start event script '%s %s %d %d %s'" % (
-                    self._eventScript, message, param2, param3, param4))
+                seiscomp.logging.error(
+                    "Failed to start event script '%s %s %d %d %s'"
+                    % (self._eventScript, message, param2, param3, param4)
+                )
         except:
             info = traceback.format_exception(*sys.exc_info())
             for i in info:

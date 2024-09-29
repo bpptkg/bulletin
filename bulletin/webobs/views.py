@@ -36,30 +36,31 @@ class WebObsEndpoint(Endpoint):
     def post(self, request):
         response = {}
 
-        action = request.POST.get('action')
+        action = request.POST.get("action")
         if action is None:
-            raise exceptions.MissingParameter('Missing action parameter.')
+            raise exceptions.MissingParameter("Missing action parameter.")
 
         if action not in SUPPORTED_WEBOBS_ACTION_NAMES:
             raise exceptions.InvalidParameter(
-                'Unsupported action name: {}'.format(action))
+                "Unsupported action name: {}".format(action)
+            )
 
-        eventdate_str = request.POST.get('eventdate')
-        eventid = request.POST.get('eventid')
-        sc3id = request.POST.get('sc3id')
-        operator = request.POST.get('operator')
-        eventtype = request.POST.get('eventtype')
+        eventdate_str = request.POST.get("eventdate")
+        eventid = request.POST.get("eventid")
+        sc3id = request.POST.get("sc3id")
+        operator = request.POST.get("operator")
+        eventtype = request.POST.get("eventtype")
 
         if action == WebObsAction.WEBOBS_UPDATE_EVENT.name:
             try:
                 eventdate = dateparse.parse_datetime(eventdate_str)
             except ValueError as e:
                 raise exceptions.InvalidParameter(
-                    'Invalid eventdate value: {}'.format(eventdate_str))
+                    "Invalid eventdate value: {}".format(eventdate_str)
+                )
 
             if eventdate is None:
-                raise exceptions.MissingParameter(
-                    'Missing eventdate parameter.')
+                raise exceptions.MissingParameter("Missing eventdate parameter.")
 
             if eventdate.tzinfo is not None:
                 eventdate = eventdate.replace(tzinfo=pytz.utc)
@@ -67,56 +68,55 @@ class WebObsEndpoint(Endpoint):
                 eventdate = pytz.utc.localize(eventdate)
 
             tasks.update_event.apply_async(
-                args=(eventdate, ),
+                args=(eventdate,),
                 kwargs={
-                    'eventid': eventid,
-                    'sc3id': sc3id,
-                    'operator': operator,
-                    'eventtype': eventtype,
+                    "eventid": eventid,
+                    "sc3id": sc3id,
+                    "operator": operator,
+                    "eventtype": eventtype,
                 },
-                serializer='pickle',
+                serializer="pickle",
             )
 
         elif action == WebObsAction.WEBOBS_HIDE_EVENT.name:
             if eventid is None:
-                raise exceptions.MissingParameter('Missing eventid parameter.')
+                raise exceptions.MissingParameter("Missing eventid parameter.")
 
             tasks.hide_event.apply_async(
-                args=(eventid, ),
-                kwargs={'operator': operator},
-                serializer='pickle',
+                args=(eventid,),
+                kwargs={"operator": operator},
+                serializer="pickle",
             )
 
         elif action == WebObsAction.WEBOBS_RESTORE_EVENT.name:
             if eventid is None:
-                raise exceptions.MissingParameter('Missing eventid parameter.')
+                raise exceptions.MissingParameter("Missing eventid parameter.")
 
             if eventtype is None:
-                raise exceptions.MissingParameter(
-                    'Missing eventtype parameter.')
+                raise exceptions.MissingParameter("Missing eventtype parameter.")
 
             tasks.restore_event.apply_async(
                 args=(eventid, eventtype),
-                kwargs={'operator': operator},
-                serializer='pickle',
+                kwargs={"operator": operator},
+                serializer="pickle",
             )
 
         elif action == WebObsAction.WEBOBS_DELETE_EVENT.name:
             if eventid is None:
-                raise exceptions.MissingParameter('Missing eventid parameter.')
+                raise exceptions.MissingParameter("Missing eventid parameter.")
 
             tasks.delete_event.apply_async(
-                args=(eventid, ),
-                kwargs={'operator': operator},
-                serializer='pickle',
+                args=(eventid,),
+                kwargs={"operator": operator},
+                serializer="pickle",
             )
 
-        response['status'] = 'submitted'
-        response['timestamp'] = timezone.now()
+        response["status"] = "submitted"
+        response["timestamp"] = timezone.now()
         action_name, action_id = get_action(action)
-        response['action'] = {
-            'id': action_id,
-            'name': action_name,
+        response["action"] = {
+            "id": action_id,
+            "name": action_name,
         }
 
         return Response(response)

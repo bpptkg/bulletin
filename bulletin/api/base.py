@@ -5,4 +5,5 @@ class Endpoint(APIView):
     """
     Base API endpoint.
     """
+
     pass

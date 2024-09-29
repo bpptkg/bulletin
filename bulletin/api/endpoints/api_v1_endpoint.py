@@ -3,8 +3,8 @@ from rest_framework.response import Response
 from ..base import Endpoint
 
 API_V1 = {
-    'version': '1',
-    'name': 'bulletin-api-v1',
+    "version": "1",
+    "name": "bulletin-api-v1",
 }
 
 

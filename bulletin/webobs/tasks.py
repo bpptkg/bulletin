@@ -14,10 +14,7 @@ from . import schema
 logger = get_task_logger(__name__)
 
 
-@app.task(
-    bind=True,
-    name='webobs_update_event',
-    max_retries=5)
+@app.task(bind=True, name="webobs_update_event", max_retries=5)
 def update_event(self, eventdate, **kwargs):
     """
     Update or create an event in the database.
@@ -26,8 +23,11 @@ def update_event(self, eventdate, **kwargs):
     # For a new event, WebObs may still generate eventid and synchronize the
     # event with SeisComP. So, we need to wait several seconds until the process
     # finished.
-    logger.info('Waiting for {}s before executing task...'.format(
-        settings.WEBOBS_UPDATE_EVENT_DELAY))
+    logger.info(
+        "Waiting for {}s before executing task...".format(
+            settings.WEBOBS_UPDATE_EVENT_DELAY
+        )
+    )
     time.sleep(settings.WEBOBS_UPDATE_EVENT_DELAY)
 
     visitor.update_event(
@@ -38,10 +38,7 @@ def update_event(self, eventdate, **kwargs):
     )
 
 
-@app.task(
-    bind=True,
-    name='webobs_hide_event',
-    max_retries=5)
+@app.task(bind=True, name="webobs_hide_event", max_retries=5)
 def hide_event(self, eventid, **kwargs):
     """
     Hide an event in the database.
@@ -54,10 +51,7 @@ def hide_event(self, eventid, **kwargs):
     )
 
 
-@app.task(
-    bind=True,
-    name='webobs_restore_event',
-    max_retries=5)
+@app.task(bind=True, name="webobs_restore_event", max_retries=5)
 def restore_event(self, eventid, eventtype, **kwargs):
     """
     Restore an event in the database.
@@ -71,10 +65,7 @@ def restore_event(self, eventid, eventtype, **kwargs):
     )
 
 
-@app.task(
-    bind=True,
-    name='webobs_delete_event',
-    max_retries=5)
+@app.task(bind=True, name="webobs_delete_event", max_retries=5)
 def delete_event(self, eventid, **kwargs):
     """
     Delete an event in the database.
@@ -87,7 +78,7 @@ def delete_event(self, eventid, **kwargs):
     )
 
 
-@app.task(name='webobs_sync_events')
+@app.task(name="webobs_sync_events")
 def sync_events(**kwargs):
     """
     Synchronize events between WebObs MC3 and seismic bulletin database and vice
@@ -100,10 +91,8 @@ def sync_events(**kwargs):
     fetcher = WebObsMC3Fetcher()
     now = timezone.now()
     start = datetime.datetime(
-        now.year,
-        now.month,
-        now.day,
-        tzinfo=now.tzinfo) - datetime.timedelta(days=1)
+        now.year, now.month, now.day, tzinfo=now.tzinfo
+    ) - datetime.timedelta(days=1)
     events = fetcher.fetch_mc3_as_dict(start, now)
     if events:
         # Sync WebObs MC3 bulletin to seismic bulletin database (forward sync).
@@ -131,7 +120,5 @@ def setup_periodic_tasks(sender, **kwargs):
     Register periodic tasks.
     """
     sender.add_periodic_task(
-        crontab(minute=0),
-        sync_events.s(),
-        name='sync events every 1 hour'
+        crontab(minute=0), sync_events.s(), name="sync events every 1 hour"
     )
