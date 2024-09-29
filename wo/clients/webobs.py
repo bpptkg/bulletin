@@ -21,16 +21,14 @@ class WebObsMC3Fetcher:
     WebObs MC3 bulletin fetcher.
     """
 
-    def __init__(self, client=None, parser=None, max_retries=5,
-                 retry_delay=10):
+    def __init__(self, client=None, parser=None, max_retries=5, retry_delay=10):
         self.max_retries = max_retries
         self.retry_delay = retry_delay
 
         if client is not None:
             self.client = client
         else:
-            self.client = MC3Client(
-                username=WEBOBS_USERNAME, password=WEBOBS_PASSWORD)
+            self.client = MC3Client(username=WEBOBS_USERNAME, password=WEBOBS_PASSWORD)
             if WEBOBS_HOST:
                 self.client.api.host = WEBOBS_HOST
 
@@ -39,7 +37,7 @@ class WebObsMC3Fetcher:
         else:
             self.parser = MC3Parser()
 
-    def request_mc3(self, start, end, eventtype='ALL'):
+    def request_mc3(self, start, end, eventtype="ALL"):
         """
         Request MC3 bulletin defined by start time, end time, and optional
         eventtype. If request succeed, return CSV string in bytes.
@@ -50,8 +48,8 @@ class WebObsMC3Fetcher:
         If request failed, it will try until max retries reached. If all retries
         failed, return None.
         """
-        logger.info('Fetching MC3 bulletin (%s)...', self.client.api.host)
-        logger.info('Time range (UTC): %s to %s', start, end)
+        logger.info("Fetching MC3 bulletin (%s)...", self.client.api.host)
+        logger.info("Time range (UTC): %s to %s", start, end)
 
         for __ in range(self.max_retries):
             try:
@@ -60,22 +58,22 @@ class WebObsMC3Fetcher:
                     endtime=end.strftime(constants.DATETIME_FORMAT),
                     type=eventtype,
                     slt=0,
-                    amplitude='ALL',
-                    ampoper='eq',
-                    dump='bul',
-                    duree='ALL',
-                    graph='movsum',
+                    amplitude="ALL",
+                    ampoper="eq",
+                    dump="bul",
+                    duree="ALL",
+                    graph="movsum",
                     hideloc=0,
                     located=0,
                     locstatus=0,
-                    mc='MC3',
+                    mc="MC3",
                 )
-                if response['status'] != '200':
-                    raise FetcherError('The server returned non-200 response')
+                if response["status"] != "200":
+                    raise FetcherError("The server returned non-200 response")
                 break
             except Exception as e:
                 logger.error(e)
-                logger.info('Retrying in %ss...', self.retry_delay)
+                logger.info("Retrying in %ss...", self.retry_delay)
                 time.sleep(self.retry_delay)
                 content = None
 
@@ -102,32 +100,32 @@ class WebObsMC3Fetcher:
             content = self.request_mc3(start, end)
 
         if content is None:
-            logger.info('Fetched content is None')
+            logger.info("Fetched content is None")
             return None
 
         df = self.parser.to_df(content)
         if df.empty:
-            logger.info('Fetched events are empty')
+            logger.info("Fetched events are empty")
             return None
         else:
-            logger.info('Fetched %s events from WebObs MC3', len(df))
+            logger.info("Fetched %s events from WebObs MC3", len(df))
 
         if sc3id is not None:
-            event = df.loc[df['seiscompid'] == sc3id]
+            event = df.loc[df["seiscompid"] == sc3id]
             if not event.empty:
-                return event.to_dict(orient='records')[0]
+                return event.to_dict(orient="records")[0]
 
         if eventid is not None:
-            event = df.loc[df['eventid'] == eventid]
+            event = df.loc[df["eventid"] == eventid]
             if not event.empty:
-                return event.to_dict(orient='records')[0]
+                return event.to_dict(orient="records")[0]
 
-        event = df.loc[df['eventdate'] == eventdate]
+        event = df.loc[df["eventdate"] == eventdate]
         if not event.empty:
-            return event.to_dict(orient='records')[0]
+            return event.to_dict(orient="records")[0]
         return None
 
-    def fetch_mc3_as_df(self, start, end, eventtype='ALL'):
+    def fetch_mc3_as_df(self, start, end, eventtype="ALL"):
         """
         Request MC3 bulletin defined by start time, end time, and optional
         eventtype returned as Pandas DataFrame.
@@ -138,12 +136,11 @@ class WebObsMC3Fetcher:
 
         # Filter exact to allow only eventdate in the defined time range.
         df = self.parser.to_df(content)
-        df = df.where((df['eventdate'] >= start) &
-                      (df['eventdate'] < end))
-        df.dropna(how='any', inplace=True, subset=['eventdate'])
+        df = df.where((df["eventdate"] >= start) & (df["eventdate"] < end))
+        df.dropna(how="any", inplace=True, subset=["eventdate"])
         return df
 
-    def fetch_mc3_as_dict(self, start, end, eventtype='ALL'):
+    def fetch_mc3_as_dict(self, start, end, eventtype="ALL"):
         """
         Request MC3 bulletin defined by start time, end time, and optional
         eventtype returned as dictionary.
@@ -151,4 +148,10 @@ class WebObsMC3Fetcher:
         df = self.fetch_mc3_as_df(start, end, eventtype=eventtype)
         if df.empty:
             return {}
-        return df.to_dict(orient='records')
+        return df.to_dict(orient="records")
+
+    def parse_mc3(self, content):
+        """
+        Parse MC3 bulletin content returned as Pandas DataFrame.
+        """
+        return self.parser.to_df(content)
