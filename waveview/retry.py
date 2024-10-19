@@ -10,17 +10,13 @@ def retry(max_retries=5, retry_delay=5):
     """
 
     if int(max_retries) < 1:
-        raise ValueError(
-            "max_retries value must be a positive integer " "and at least 1."
-        )
+        raise ValueError("max_retries value must be a positive integer and at least 1.")
 
     def inner(func):
         def wrapper(*args, **kwargs):
-            status = False
-
             for _ in range(int(max_retries)):
                 try:
-                    func(*args, **kwargs)
+                    return func(*args, **kwargs)
                 except Exception as e:
                     logger.error(
                         "%s function execution failed: %s. Retrying in %ss...",
